@@ -90,6 +90,13 @@ namespace face_swap
 	FACE_SWAP_EXPORT bool writeFaceData(const std::string& path, const FaceData& face_data,
 		bool overwrite = false);
 
+	/**	Write img to file.
+	@param[in] path Path to an image or a directory. 
+	@param[in] face_data Includes all the images and intermediate data for the specific face.
+	@return true if the image was written to file, else false.
+	*/
+	FACE_SWAP_EXPORT bool writeImage(const std::string& path, const cv::Mat& image);
+
 
 }   // namespace face_swap
 

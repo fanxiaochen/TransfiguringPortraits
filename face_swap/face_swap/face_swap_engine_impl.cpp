@@ -11,6 +11,7 @@
 #include <opencv2/photo.hpp>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>  // Debug
+#include <opencv2/calib3d/calib3d.hpp>
 
 using sclock = std::chrono::system_clock;
 using ms = std::chrono::milliseconds;
@@ -362,14 +363,18 @@ namespace face_swap
 
 	bool FaceSwapEngineImpl::estimate(FaceData& face_data)
 	{
+		// preprocess
+		preprocessImages(face_data);
+
 		// face segmentation
 		segment(face_data);
 
 		// 2d landmarks
 		landmarks(face_data);
 
-		// 3d shape coefficients and pose
-		shape(face_data);
+	//	// 3d shape coefficients and pose
+	//	shape(face_data);
+
 
 		return true;
 	}
@@ -380,11 +385,46 @@ namespace face_swap
 		return true;
 	}
 
+	cv::Mat FaceSwapEngineImpl::align(FaceData& src_data,  FaceData& tgt_data)
+	{
+		// convex hull
+		std::vector<cv::Point2d> hull_src;
+		std::vector<cv::Point2d> hull_tgt;
+		std::vector<int> hull_idx;
+		convexHull(tgt_data.cropped_landmarks, hull_idx, false, false);
+		for(int i = 0; i < hull_idx.size(); i++)
+		{
+			hull_src.push_back(src_data.cropped_landmarks[hull_idx[i]]);
+			hull_tgt.push_back(tgt_data.cropped_landmarks[hull_idx[i]]);
+		}
+
+		//cv::Mat t = cv::estimateAffinePartial2D(hull_src, hull_tgt);
+		cv::Mat t;
+		computeRigid(hull_src, hull_tgt, t);
+		cv::Mat warpped;
+		cv::warpAffine(src_data.cropped_img, warpped, t, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		writeImage("warpped.jpg", warpped);
+
+		writeImage("src_seg.png",src_data.cropped_seg);
+		writeImage("src_face.png",src_data.cropped_img);
+		writeImage("tgt_seg.png",tgt_data.cropped_seg);
+		writeImage("tgt_face.png",tgt_data.cropped_img);
+
+		return t;
+	}
+
+	cv::Mat FaceSwapEngineImpl::fine_tune(FaceData& src_data,  FaceData& tgt_data)
+	{
+		return cv::Mat();
+	}
+
 	cv::Mat FaceSwapEngineImpl::transfer(FaceData& src_data, FaceData& tgt_data)
 	{
 		// align source face mask into target face mask using 2d landmarks
+		cv::Mat aligned_mat = align(src_data, tgt_data);
 
 		// optimization with landmarks and edge map of segmentation mask
+		cv::Mat tuned_mat = fine_tune(src_data, tgt_data);
 
 		// blending
 		return cv::Mat();
@@ -411,6 +451,91 @@ namespace face_swap
 		m_cnn_3dmm_expr->process(face_data.cropped_img, face_data.cropped_landmarks,
 			face_data.shape_coefficients, face_data.tex_coefficients,
 			face_data.expr_coefficients, face_data.vecR, face_data.vecT, face_data.K);
+		return true;
+	}
+
+	// https://stackoverflow.com/questions/21206870/opencv-rigid-transformation-between-two-3d-point-clouds
+	bool FaceSwapEngineImpl::computeRigid(const std::vector<cv::Point2d> &srcPoints, const std::vector<cv::Point2d> &dstPoints, cv::Mat &transf)
+	{
+		// sanity check
+		if ((srcPoints.size() < 2) || (srcPoints.size() != dstPoints.size()))
+			return false;
+		
+		auto convert2Mat = [](const std::vector<cv::Point2d>& points)
+		{
+			cv::Mat_<cv::Vec2d> m(cv::Size(points.size(), 1));
+			for (int i = 0; i < points.size(); ++ i)
+				m(i, 0) = cv::Vec2d(points[i].x, points[i].y);
+
+			return m;
+		};
+
+		cv::Mat_<cv::Vec2d> source = convert2Mat(srcPoints);
+		cv::Mat_<cv::Vec2d> target = convert2Mat(dstPoints);
+
+		auto calMean = [](const cv::Mat_<cv::Vec2d>& points)
+		{
+			cv::Mat_<cv::Vec2d> result;
+	    	cv::reduce(points, result, 0, CV_REDUCE_AVG);
+    		return result(0, 0);
+		};
+
+		auto centeredPoints = [](const cv::Mat_<cv::Vec2d>& points, cv::Vec2d c)
+		{
+			return points - c;
+		};
+
+		/* Calculate centroids. */
+		cv::Vec2d c1 = calMean(source);
+		cv::Vec2d c2 = calMean(target);
+
+		cv::Mat_<double> T1 = cv::Mat_<double>::eye(3, 3);
+		T1(0, 2) = c1[0];
+		T1(1, 2) = c1[1];
+
+		cv::Mat_<double> T2 = cv::Mat_<double>::eye(3, 3);
+		T2(0, 2) = -c2[0];
+		T2(1, 2) = -c2[1];
+
+		/* Calculate covariance matrix for input points. Also calculate RMS deviation from centroid
+		* which is used for scale calculation.
+		*/
+		cv::Mat_<cv::Vec2d> srcM = centeredPoints(source, c1);
+		cv::Mat_<cv::Vec2d> dstM = centeredPoints(target, c2);
+		cv::Mat_<double> C(2, 2, 0.0);
+		double p1Rms = 0, p2Rms = 0;
+		for (int ptIdx = 0; ptIdx < srcM.rows; ptIdx++) {
+			cv::Vec2d p1 = srcM(ptIdx, 0);
+			cv::Vec2d p2 = dstM(ptIdx, 0);
+			p1Rms += p1.dot(p1);
+			p2Rms += p2.dot(p2);
+			for (int i = 0; i < 2; i++) {
+				for (int j = 0; j < 2; j++) {
+					C(i, j) += p2[i] * p1[j];
+				}
+			}
+		}
+
+		cv::Mat_<double> u, s, vh;
+		cv::SVD::compute(C, s, u, vh);
+
+		cv::Mat_<double> R = u * vh;
+
+		if (cv::determinant(R) < 0) {
+			R -= u.col(1) * (vh.row(1) * 2.0);
+		}
+
+		double scale = sqrt(p2Rms / p1Rms);
+    	R *= scale;
+
+    	cv::Mat_<double> M = cv::Mat_<double>::eye(3, 3);
+    	R.copyTo(M.colRange(0, 2).rowRange(0, 2));
+
+		cv::Mat_<double> result = T2 * M * T1;
+		result /= result(2, 2);
+
+		transf = result.rowRange(0, 2);
+
 		return true;
 	}
 

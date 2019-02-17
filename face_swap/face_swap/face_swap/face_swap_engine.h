@@ -122,6 +122,20 @@ namespace face_swap
 		@return The output face swapped image.
 		*/
 		virtual cv::Mat transfer(FaceData& src_data, FaceData& tgt_data) = 0;
+
+		/**	align the face in the source image and the face in the target image.
+		@param[in] src_data Includes all the images and intermediate data for the specific face.
+		@param[in] tgt_data Includes all the images and intermediate data for the specific face.
+		@return The aligned matrix.
+		*/
+		virtual cv::Mat align(FaceData& src_data, FaceData& tgt_data) = 0;
+
+		/**	fine-tuning the alignment the face in the source image and the face in the target image.
+		@param[in] src_data Includes all the images and intermediate data for the specific face.
+		@param[in] tgt_data Includes all the images and intermediate data for the specific face.
+		@return The aligned matrix.
+		*/
+		virtual cv::Mat fine_tune(FaceData& src_data, FaceData& tgt_data) = 0;
 	};
 
 }   // namespace face_swap

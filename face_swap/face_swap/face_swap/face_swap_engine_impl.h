@@ -82,6 +82,20 @@ namespace face_swap
 		*/
 		bool shape(FaceData& face_data);
 
+		/**	align the face in the source image and the face in the target image.
+		@param[in] src_data Includes all the images and intermediate data for the specific face.
+		@param[in] tgt_data Includes all the images and intermediate data for the specific face.
+		@return The aligned matrix.
+		*/
+		cv::Mat align(FaceData& src_data, FaceData& tgt_data);
+
+		/**	fine-tuning the alignment the face in the source image and the face in the target image.
+		@param[in] src_data Includes all the images and intermediate data for the specific face.
+		@param[in] tgt_data Includes all the images and intermediate data for the specific face.
+		@return The aligned matrix.
+		*/
+		cv::Mat fine_tune(FaceData& src_data, FaceData& tgt_data);
+
 	private:
 
 		/** Crops the image and it's corresponding segmentation according
@@ -90,6 +104,14 @@ namespace face_swap
 		@return true for success and false for failure.
 		*/
 		bool preprocessImages(FaceData& face_data);
+
+		/** Compute affine transform for two point sets 
+		@param[in] srcPoints Source set.
+		@param[in] dstPoints Target set.
+		@return the transform.
+		*/
+		bool computeRigid(const std::vector<cv::Point2d> &srcPoints, const std::vector<cv::Point2d> &dstPoints, cv::Mat &transf);
+
 
 	private:
 		//std::shared_ptr<sfl::SequenceFaceLandmarks> m_sfl;

@@ -614,6 +614,12 @@ namespace face_swap
 		return false;
 #endif // WITH_PROTOBUF		
 	}
+
+
+	bool writeImage(const std::string& path, const cv::Mat& img)
+	{
+		return cv::imwrite(path, img);
+	}
 	
 }   // namespace face_swap
 

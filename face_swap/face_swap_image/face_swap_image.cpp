@@ -99,8 +99,8 @@ int main(int argc, char* argv[])
 		exit(1);
 	}
 
-	try
-	{
+	// try
+	// {
         // Initialize face swap
 		std::shared_ptr<face_swap::FaceSwapEngine> fs =
 			face_swap::FaceSwapEngine::createInstance(
@@ -129,74 +129,78 @@ int main(int argc, char* argv[])
         // Set source and target
 		/*if (!fs.setImages(source_img, target_img, source_seg, target_seg))
 			throw std::runtime_error("Failed to find faces in one of the images!");*/
-
-        // Do face swap
-        //cv::Mat rendered_img = fs.swap();
-		//face_swap::FaceData src_data, tgt_data;
-		//src_data.img = source_img;
-		src_data.seg = source_seg;
-		//tgt_data.img = target_img;
-		tgt_data.seg = target_seg;
-		std::cout << "Processing source image..." << std::endl;
-		fs->process(src_data);
-		std::cout << "Processing target image..." << std::endl;
-		fs->process(tgt_data);
-		std::cout << "Swapping images..." << std::endl;
-		cv::Mat rendered_img = fs->swap( src_data, tgt_data);
-        if (rendered_img.empty())
-            throw std::runtime_error("Face swap failed!");
-
-        // Write output to file
-        path out_file_path = output_path;
-		path out_dir_path = output_path;
-        if (is_directory(output_path))
-        {
-            path outputName = (path(input_paths[0]).stem() += "_") += 
-                (path(input_paths[1]).stem() += ".jpg");
-			out_file_path = path(output_path) /= outputName;
-        }
-		else out_dir_path = path(output_path).parent_path();
-        cv::imwrite(out_file_path.string(), rendered_img);
-
-		// Write cache
-		if (cache)
-		{
-			writeFaceData(input_paths[0], src_data);
-			writeFaceData(input_paths[1], tgt_data);
-		}
-
-		// Debug
-		if (verbose > 0)
-		{
-			// Write rendered image
-			path debug_render_path = out_dir_path /
-				(out_file_path.stem() += "_debug.jpg");
-
-			cv::Mat src_render = fs->renderFaceData(src_data);
-			cv::Mat tgt_render = fs->renderFaceData(tgt_data);
-			cv::Mat debug_render_img;
-			int width = std::min(src_render.cols, tgt_render.cols);
-			if (src_render.cols > width)
-			{
-				int height = (int)std::round(src_render.rows * (float(width) / src_render.cols));
-				cv::resize(src_render, src_render, cv::Size(width, height));
-			}
-			else
-			{
-				int height = (int)std::round(tgt_render.rows * (float(width) / tgt_render.cols));
-				cv::resize(tgt_render, tgt_render, cv::Size(width, height));
-			}
-			cv::vconcat(src_render, tgt_render, debug_render_img);
-
-			cv::imwrite(debug_render_path.string(), debug_render_img);
-		}
 		
-	}
-	catch (std::exception& e)
-	{
-		cerr << e.what() << endl;
-		return 1;
-	}
+		fs->estimate(src_data);
+		fs->estimate(tgt_data);
+		fs->align(src_data, tgt_data);
+
+    //     // Do face swap
+    //     //cv::Mat rendered_img = fs.swap();
+	// 	//face_swap::FaceData src_data, tgt_data;
+	// 	//src_data.img = source_img;
+	// 	src_data.seg = source_seg;
+	// 	//tgt_data.img = target_img;
+	// 	tgt_data.seg = target_seg;
+	// 	std::cout << "Processing source image..." << std::endl;
+	// 	fs->process(src_data);
+	// 	std::cout << "Processing target image..." << std::endl;
+	// 	fs->process(tgt_data);
+	// 	std::cout << "Swapping images..." << std::endl;
+	// 	cv::Mat rendered_img = fs->swap( src_data, tgt_data);
+    //     if (rendered_img.empty())
+    //         throw std::runtime_error("Face swap failed!");
+
+    //     // Write output to file
+    //     path out_file_path = output_path;
+	// 	path out_dir_path = output_path;
+    //     if (is_directory(output_path))
+    //     {
+    //         path outputName = (path(input_paths[0]).stem() += "_") += 
+    //             (path(input_paths[1]).stem() += ".jpg");
+	// 		out_file_path = path(output_path) /= outputName;
+    //     }
+	// 	else out_dir_path = path(output_path).parent_path();
+    //     cv::imwrite(out_file_path.string(), rendered_img);
+
+	// 	// Write cache
+	// 	if (cache)
+	// 	{
+	// 		writeFaceData(input_paths[0], src_data);
+	// 		writeFaceData(input_paths[1], tgt_data);
+	// 	}
+
+	// 	// Debug
+	// 	if (verbose > 0)
+	// 	{
+	// 		// Write rendered image
+	// 		path debug_render_path = out_dir_path /
+	// 			(out_file_path.stem() += "_debug.jpg");
+
+	// 		cv::Mat src_render = fs->renderFaceData(src_data);
+	// 		cv::Mat tgt_render = fs->renderFaceData(tgt_data);
+	// 		cv::Mat debug_render_img;
+	// 		int width = std::min(src_render.cols, tgt_render.cols);
+	// 		if (src_render.cols > width)
+	// 		{
+	// 			int height = (int)std::round(src_render.rows * (float(width) / src_render.cols));
+	// 			cv::resize(src_render, src_render, cv::Size(width, height));
+	// 		}
+	// 		else
+	// 		{
+	// 			int height = (int)std::round(tgt_render.rows * (float(width) / tgt_render.cols));
+	// 			cv::resize(tgt_render, tgt_render, cv::Size(width, height));
+	// 		}
+	// 		cv::vconcat(src_render, tgt_render, debug_render_img);
+
+	// 		cv::imwrite(debug_render_path.string(), debug_render_img);
+	// 	}
+		
+	// }
+	// catch (std::exception& e)
+	// {
+	// 	cerr << e.what() << endl;
+	// 	return 1;
+	// }
 
 	return 0;
 }
