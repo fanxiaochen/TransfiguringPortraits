@@ -394,9 +394,14 @@ namespace face_swap
 		convexHull(tgt_data.cropped_landmarks, hull_idx, false, false);
 		for(int i = 0; i < hull_idx.size(); i++)
 		{
-			hull_src.push_back(src_data.cropped_landmarks[hull_idx[i]]);
-			hull_tgt.push_back(tgt_data.cropped_landmarks[hull_idx[i]]);
+			cv::Point src_lm = src_data.cropped_landmarks[hull_idx[i]];
+			cv::Point tgt_lm = tgt_data.cropped_landmarks[hull_idx[i]];
+			hull_src.push_back(cv::Point2d((double)src_lm.x, (double)src_lm.y));
+			hull_tgt.push_back(cv::Point2d((double)tgt_lm.x, (double)tgt_lm.y));
+			std::cout << hull_idx[i] <<  " ";
 		}
+		std::cout << std::endl;
+		std::cout << hull_src << std::endl;
 
 		//cv::Mat t = cv::estimateAffinePartial2D(hull_src, hull_tgt);
 		cv::Mat t;
@@ -463,9 +468,9 @@ namespace face_swap
 		
 		auto convert2Mat = [](const std::vector<cv::Point2d>& points)
 		{
-			cv::Mat_<cv::Vec2d> m(cv::Size(points.size(), 1));
+			cv::Mat_<cv::Vec2d> m(cv::Size(1, points.size()));
 			for (int i = 0; i < points.size(); ++ i)
-				m(i, 0) = cv::Vec2d(points[i].x, points[i].y);
+				m(i) = cv::Vec2d(points[i].x, points[i].y);
 
 			return m;
 		};
@@ -477,6 +482,9 @@ namespace face_swap
 		{
 			cv::Mat_<cv::Vec2d> result;
 	    	cv::reduce(points, result, 0, CV_REDUCE_AVG);
+
+	//		std::cout << points << std::endl;
+	//		std::cout << result<< std::endl;
     		return result(0, 0);
 		};
 
@@ -490,12 +498,12 @@ namespace face_swap
 		cv::Vec2d c2 = calMean(target);
 
 		cv::Mat_<double> T1 = cv::Mat_<double>::eye(3, 3);
-		T1(0, 2) = c1[0];
-		T1(1, 2) = c1[1];
+		T1(0, 2) = -c1[0];
+		T1(1, 2) = -c1[1];
 
 		cv::Mat_<double> T2 = cv::Mat_<double>::eye(3, 3);
-		T2(0, 2) = -c2[0];
-		T2(1, 2) = -c2[1];
+		T2(0, 2) = c2[0];
+		T2(1, 2) = c2[1];
 
 		/* Calculate covariance matrix for input points. Also calculate RMS deviation from centroid
 		* which is used for scale calculation.
@@ -505,13 +513,13 @@ namespace face_swap
 		cv::Mat_<double> C(2, 2, 0.0);
 		double p1Rms = 0, p2Rms = 0;
 		for (int ptIdx = 0; ptIdx < srcM.rows; ptIdx++) {
-			cv::Vec2d p1 = srcM(ptIdx, 0);
-			cv::Vec2d p2 = dstM(ptIdx, 0);
+			cv::Vec2d p1 = srcM(ptIdx);
+			cv::Vec2d p2 = dstM(ptIdx);
 			p1Rms += p1.dot(p1);
 			p2Rms += p2.dot(p2);
 			for (int i = 0; i < 2; i++) {
 				for (int j = 0; j < 2; j++) {
-					C(i, j) += p2[i] * p1[j];
+					C(i, j) += p1[i] * p2[j];
 				}
 			}
 		}
@@ -532,9 +540,17 @@ namespace face_swap
     	R.copyTo(M.colRange(0, 2).rowRange(0, 2));
 
 		cv::Mat_<double> result = T2 * M * T1;
-		result /= result(2, 2);
 
 		transf = result.rowRange(0, 2);
+
+		std::cout << source << std::endl;
+		std::cout << srcM << std::endl;
+		std::cout << C << std::endl;
+		std::cout << R << std::endl;
+		std::cout << T2 << std::endl;
+		std::cout << M << std::endl;
+		std::cout << T1 << std::endl;
+		std::cout << transf << std::endl;
 
 		return true;
 	}
