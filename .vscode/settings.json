@@ -13,6 +13,7 @@
         "streambuf": "cpp",
         "string_view": "cpp",
         "thread": "cpp",
-        "tuple": "cpp"
+        "tuple": "cpp",
+        "memory": "cpp"
     }
 }

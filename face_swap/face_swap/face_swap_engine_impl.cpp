@@ -398,14 +398,17 @@ namespace face_swap
 			cv::Point tgt_lm = tgt_data.cropped_landmarks[hull_idx[i]];
 			hull_src.push_back(cv::Point2d((double)src_lm.x, (double)src_lm.y));
 			hull_tgt.push_back(cv::Point2d((double)tgt_lm.x, (double)tgt_lm.y));
-			std::cout << hull_idx[i] <<  " ";
+			//std::cout << hull_idx[i] <<  " ";
 		}
-		std::cout << std::endl;
-		std::cout << hull_src << std::endl;
+		//std::cout << std::endl;
+		//std::cout << hull_src << std::endl;
 
 		//cv::Mat t = cv::estimateAffinePartial2D(hull_src, hull_tgt);
 		cv::Mat t;
 		computeRigid(hull_src, hull_tgt, t);
+	//	t.at<double>(0, 1) = - t.at<double>(0, 1);
+	//	t.at<double>(1, 0) = - t.at<double>(1, 0);
+		std::cout << t << std::endl;
 		cv::Mat warpped;
 		cv::warpAffine(src_data.cropped_img, warpped, t, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
 		writeImage("warpped.jpg", warpped);
@@ -460,6 +463,7 @@ namespace face_swap
 	}
 
 	// https://stackoverflow.com/questions/21206870/opencv-rigid-transformation-between-two-3d-point-clouds
+	// https://docs.opencv.org/3.1.0/d4/d61/tutorial_warp_affine.html
 	bool FaceSwapEngineImpl::computeRigid(const std::vector<cv::Point2d> &srcPoints, const std::vector<cv::Point2d> &dstPoints, cv::Mat &transf)
 	{
 		// sanity check
@@ -470,7 +474,7 @@ namespace face_swap
 		{
 			cv::Mat_<cv::Vec2d> m(cv::Size(1, points.size()));
 			for (int i = 0; i < points.size(); ++ i)
-				m(i) = cv::Vec2d(points[i].x, points[i].y);
+				m(i) = cv::Vec2d(points[i].y, points[i].x); // here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
 
 			return m;
 		};
