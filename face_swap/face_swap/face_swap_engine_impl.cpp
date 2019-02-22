@@ -408,10 +408,10 @@ namespace face_swap
 		computeRigid(hull_src, hull_tgt, t);
 	//	t.at<double>(0, 1) = - t.at<double>(0, 1);
 	//	t.at<double>(1, 0) = - t.at<double>(1, 0);
-		std::cout << t << std::endl;
-		cv::Mat warpped;
-		cv::warpAffine(src_data.cropped_img, warpped, t, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-		writeImage("warpped.jpg", warpped);
+	//	std::cout << t << std::endl;
+	//	cv::Mat warpped;
+	//	cv::warpAffine(src_data.cropped_img, warpped, t, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+	//	writeImage("warpped.jpg", warpped);
 
 		writeImage("src_seg.png",src_data.cropped_seg);
 		writeImage("src_face.png",src_data.cropped_img);
@@ -435,6 +435,46 @@ namespace face_swap
 		cv::Mat tuned_mat = fine_tune(src_data, tgt_data);
 
 		// blending
+		auto mask_center = [](cv::Mat mask)
+		{
+			int h = mask.rows;
+			int w = mask.cols;
+			cv::Mat gray = cv::Mat(mask.size(), CV_8UC1);
+			if(mask.channels() == 3)
+				cv::cvtColor(mask, gray, cv::COLOR_BGR2GRAY);
+			else
+				gray = mask;
+
+    		int minx = INT_MAX, miny = INT_MAX, maxx = INT_MIN, maxy = INT_MIN;
+			for(int i=0;i<h;i++)
+			{
+				for(int j=0;j<w;j++)
+				{
+					if(gray.at<uchar>(i,j) == 255)
+					{
+						minx = std::min(minx,i);
+						maxx = std::max(maxx,i);
+						miny = std::min(miny,j);
+						maxy = std::max(maxy,j);
+					}
+				}
+			}
+
+			return cv::Point((miny + maxy)/2, (minx + maxx)/2);
+		};
+
+		cv::Mat warpped_img, warpped_seg;
+		cv::warpAffine(src_data.cropped_img, warpped_img, aligned_mat, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		cv::warpAffine(src_data.cropped_seg, warpped_seg, aligned_mat, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		writeImage("warpped_img.jpg", warpped_img);
+		writeImage("warpped_seg.jpg", warpped_seg);
+
+		cv::Mat blended;
+		cv::Point p = mask_center(tgt_data.cropped_seg);
+		std::cout << "center:" << p << std::endl;
+		cv::seamlessClone(warpped_img, tgt_data.cropped_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
+		writeImage("cloned.jpg", blended);
+
 		return cv::Mat();
 	}
 
