@@ -135,7 +135,7 @@ namespace face_swap
 		@param[in] tgt_data Includes all the images and intermediate data for the specific face.
 		@return The aligned matrix.
 		*/
-		virtual cv::Mat fine_tune(FaceData& src_data, FaceData& tgt_data) = 0;
+		virtual cv::Mat fine_tune(cv::Mat& src_data, cv::Mat& tgt_data) = 0;
 	};
 
 }   // namespace face_swap

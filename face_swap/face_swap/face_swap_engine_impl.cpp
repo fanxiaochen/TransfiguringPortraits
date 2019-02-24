@@ -12,6 +12,7 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/highgui.hpp>  // Debug
 #include <opencv2/calib3d/calib3d.hpp>
+#include <opencv2/flann/miniflann.hpp>
 
 using sclock = std::chrono::system_clock;
 using ms = std::chrono::milliseconds;
@@ -388,16 +389,16 @@ namespace face_swap
 	cv::Mat FaceSwapEngineImpl::align(FaceData& src_data,  FaceData& tgt_data)
 	{
 		// convex hull
-		std::vector<cv::Point2d> hull_src;
-		std::vector<cv::Point2d> hull_tgt;
+		std::vector<cv::Point> hull_src;
+		std::vector<cv::Point> hull_tgt;
 		std::vector<int> hull_idx;
 		convexHull(tgt_data.cropped_landmarks, hull_idx, false, false);
 		for(int i = 0; i < hull_idx.size(); i++)
 		{
 			cv::Point src_lm = src_data.cropped_landmarks[hull_idx[i]];
 			cv::Point tgt_lm = tgt_data.cropped_landmarks[hull_idx[i]];
-			hull_src.push_back(cv::Point2d((double)src_lm.x, (double)src_lm.y));
-			hull_tgt.push_back(cv::Point2d((double)tgt_lm.x, (double)tgt_lm.y));
+			hull_src.push_back(cv::Point(src_lm.x, src_lm.y));
+			hull_tgt.push_back(cv::Point(tgt_lm.x, tgt_lm.y));
 			//std::cout << hull_idx[i] <<  " ";
 		}
 		//std::cout << std::endl;
@@ -421,9 +422,32 @@ namespace face_swap
 		return t;
 	}
 
-	cv::Mat FaceSwapEngineImpl::fine_tune(FaceData& src_data,  FaceData& tgt_data)
+	cv::Mat FaceSwapEngineImpl::fine_tune(cv::Mat& src_data, cv::Mat& tgt_data)
 	{
-		return cv::Mat();
+		// extract mask boundary
+		auto mask_boundary = [](cv::Mat mask)
+		{
+			std::vector<std::vector<cv::Point>> contours;
+			std::vector<cv::Point> totalContours;
+			cv::findContours(mask, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);		
+			//for (auto contour : contours)
+			//	totalContours.insert(totalContours.end(), contour.begin(), contour.end());
+
+			//return totalContours;
+			return contours[0];
+		};
+
+		auto source = mask_boundary(src_data);
+		auto target = mask_boundary(tgt_data);
+
+		//for (int i = 0; i < src_data.cropped_landmarks.size(); ++i)
+		//	std::cout << "2d lm:" << src_data.cropped_landmarks[i].x << "," << src_data.cropped_landmarks[i].y << std::endl;
+
+		cv::Mat t;
+		//icp(src_data.cropped_landmarks, tgt_data.cropped_landmarks, t);
+		icp(source, target, t);
+		
+		return t;
 	}
 
 	cv::Mat FaceSwapEngineImpl::transfer(FaceData& src_data, FaceData& tgt_data)
@@ -432,9 +456,15 @@ namespace face_swap
 		cv::Mat aligned_mat = align(src_data, tgt_data);
 
 		// optimization with landmarks and edge map of segmentation mask
-		cv::Mat tuned_mat = fine_tune(src_data, tgt_data);
+		cv::Mat warpped_src_img, warpped_src_seg;
+		cv::warpAffine(src_data.cropped_img, warpped_src_img, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		cv::warpAffine(src_data.cropped_seg, warpped_src_seg, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		writeImage("warpped_src_img.jpg", warpped_src_img);
+		writeImage("warpped_src_seg.jpg", warpped_src_seg);
+		cv::Mat tuned_mat = fine_tune(warpped_src_seg, tgt_data.cropped_seg);
 
 		// blending
+		cv::Mat t = tuned_mat * aligned_mat;
 		auto mask_center = [](cv::Mat mask)
 		{
 			int h = mask.rows;
@@ -464,8 +494,8 @@ namespace face_swap
 		};
 
 		cv::Mat warpped_img, warpped_seg;
-		cv::warpAffine(src_data.cropped_img, warpped_img, aligned_mat, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-		cv::warpAffine(src_data.cropped_seg, warpped_seg, aligned_mat, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		cv::warpAffine(src_data.cropped_img, warpped_img, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		cv::warpAffine(src_data.cropped_seg, warpped_seg, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
 		writeImage("warpped_img.jpg", warpped_img);
 		writeImage("warpped_seg.jpg", warpped_seg);
 
@@ -504,23 +534,27 @@ namespace face_swap
 
 	// https://stackoverflow.com/questions/21206870/opencv-rigid-transformation-between-two-3d-point-clouds
 	// https://docs.opencv.org/3.1.0/d4/d61/tutorial_warp_affine.html
-	bool FaceSwapEngineImpl::computeRigid(const std::vector<cv::Point2d> &srcPoints, const std::vector<cv::Point2d> &dstPoints, cv::Mat &transf)
+	bool FaceSwapEngineImpl::computeRigid(const std::vector<cv::Point> &srcPoints, const std::vector<cv::Point> &dstPoints, cv::Mat &transf, bool xyExchange)
 	{
 		// sanity check
 		if ((srcPoints.size() < 2) || (srcPoints.size() != dstPoints.size()))
 			return false;
 		
-		auto convert2Mat = [](const std::vector<cv::Point2d>& points)
+		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange = false)
 		{
 			cv::Mat_<cv::Vec2d> m(cv::Size(1, points.size()));
 			for (int i = 0; i < points.size(); ++ i)
-				m(i) = cv::Vec2d(points[i].y, points[i].x); // here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
-
+			{
+				if (xyExchange)
+					m(i) = cv::Vec2d(points[i].y, points[i].x); // here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
+				else 
+					m(i) = cv::Vec2d(points[i].x, points[i].y); 
+			}
 			return m;
 		};
 
-		cv::Mat_<cv::Vec2d> source = convert2Mat(srcPoints);
-		cv::Mat_<cv::Vec2d> target = convert2Mat(dstPoints);
+		cv::Mat_<cv::Vec2d> source = convert2Mat(srcPoints, xyExchange);
+		cv::Mat_<cv::Vec2d> target = convert2Mat(dstPoints, xyExchange);
 
 		auto calMean = [](const cv::Mat_<cv::Vec2d>& points)
 		{
@@ -585,15 +619,110 @@ namespace face_swap
 
 		cv::Mat_<double> result = T2 * M * T1;
 
-		transf = result.rowRange(0, 2);
+//		transf = result.rowRange(0, 2);
+		transf = result;
 
-		std::cout << source << std::endl;
-		std::cout << srcM << std::endl;
-		std::cout << C << std::endl;
-		std::cout << R << std::endl;
-		std::cout << T2 << std::endl;
-		std::cout << M << std::endl;
-		std::cout << T1 << std::endl;
+//		std::cout << source << std::endl;
+//		std::cout << srcM << std::endl;
+//		std::cout << C << std::endl;
+//		std::cout << R << std::endl;
+//		std::cout << T2 << std::endl;
+//		std::cout << M << std::endl;
+//		std::cout << T1 << std::endl;
+//		std::cout << transf << std::endl;
+
+		return true;
+	}
+
+	bool FaceSwapEngineImpl::icp(const std::vector<cv::Point> &srcPoints, const std::vector<cv::Point> &dstPoints, cv::Mat &transf)
+	{
+		// sanity check
+		if ((srcPoints.size() < 2) || (dstPoints.size() < 2))
+			return false;
+		
+		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange = true)
+		{
+			cv::Mat_<float> m(cv::Size(2, points.size()));
+			for (int i = 0; i < points.size(); ++ i)
+			{
+				if (xyExchange)
+				{
+					// here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
+					m.at<float>(i, 0) = (float)points[i].y; 
+					m.at<float>(i, 1) = (float)points[i].x; 
+				}
+				else 
+				{
+					m.at<float>(i, 0) = (float)points[i].x; 
+					m.at<float>(i, 1) = (float)points[i].y; 
+				}
+			}
+
+			return m;
+		};
+
+		cv::Mat_<float> source = convert2Mat(srcPoints);
+		cv::Mat_<float> target = convert2Mat(dstPoints);
+
+		auto knn = [](cv::Mat_<float> source, cv::flann::Index& kdtree)
+		{
+			// find knn
+			cv::Mat indices, dists;
+			kdtree.knnSearch(source, indices, dists, 1);
+
+		//	std::cout << source.at<float>(0, 0) << "," << source.at<float>(0,1) << std::endl<< std::endl;
+		//	std::cout << "knn indices:" << indices.cols << "," << indices.rows << std::endl;
+
+			return indices;
+		};
+
+		auto convert = [](cv::Mat_<float> source, cv::Mat_<float> target, cv::Mat indices)
+		{
+			std::vector<cv::Point> srcPoints, dstPoints;
+			for (int i = 0; i < indices.rows; ++ i)
+			{
+				srcPoints.push_back(cv::Point((int)source.at<float>(i, 0), (int)source.at<float>(i, 1)));
+				dstPoints.push_back(cv::Point((int)target.at<float>(indices.at<int>(i,0), 0), (int)target.at<float>(indices.at<int>(i,0), 1)));
+			}
+
+			return std::make_tuple(srcPoints, dstPoints);
+		};
+
+		int iterNum = 10;
+		int loop = 0;	
+		cv::Mat_<double> total = cv::Mat_<double>::eye(3, 3);
+
+		cv::flann::Index kdtree(target, cv::flann::KDTreeIndexParams(1));
+		do
+		{
+			// build correspondences
+			auto indices = knn(source, kdtree);
+			auto tuple = convert(source, target, indices);
+
+			// compute rigid transform
+			cv::Mat_<double> t;
+			auto srcP = std::get<0>(tuple);
+			auto dstP = std::get<1>(tuple);
+			computeRigid(srcP, dstP, t, false);
+
+			std::cout << "after rigid t:" << std::endl;
+			// transform source 
+
+			std::cout << "before:" << srcP[0].x << "," << srcP[0].y << std::endl;
+			std::cout << t << std::endl;
+			cv::transform(srcP, srcP, t.rowRange(0,2));
+			std::cout << "after:" << srcP[0].x << "," << srcP[0].y << std::endl;
+		//	std::cout << "after transform" << std::endl;
+			total = t * total;
+		//	std::cout << "after accu" << std::endl;
+			source = convert2Mat(srcP, false);
+
+			loop ++;	
+		}while(loop < iterNum);
+	
+		transf = total;
+
+		std::cout << "icp transform" << std::endl;
 		std::cout << transf << std::endl;
 
 		return true;
