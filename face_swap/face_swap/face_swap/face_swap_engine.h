@@ -20,6 +20,7 @@ namespace face_swap
 		cv::Mat seg;
 
 		// Intermediate pipeline data
+		float scale= 1;
 		cv::Mat scaled_img;
 		cv::Mat scaled_seg;
 		cv::Mat cropped_img;

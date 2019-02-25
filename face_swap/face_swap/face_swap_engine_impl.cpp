@@ -318,6 +318,8 @@ namespace face_swap
 		{
 			float scale = (float)face_data.max_bbox_res / (float)face_data.bbox.width;
 
+			face_data.scale = scale;
+
 			// Scale landmarks
 			for (cv::Point& p : face_data.scaled_landmarks)
 			{
@@ -383,6 +385,11 @@ namespace face_swap
 	bool FaceSwapEngineImpl::compare(FaceData& src_data, FaceData& tgt_data)
 	{
 		// compare 2d segmentation map and 3d shape and pose
+		auto src_shapes = src_data.shape_coefficients;
+		auto src_expr = src_data.expr_coefficients;
+		auto tgt_shapes = tgt_data.shape_coefficients;
+		auto tgt_expr = tgt_data.expr_coefficients;
+
 		return true;
 	}
 
@@ -500,9 +507,15 @@ namespace face_swap
 		writeImage("warpped_seg.jpg", warpped_seg);
 
 		cv::Mat blended;
-		cv::Point p = mask_center(tgt_data.cropped_seg);
+		//cv::Point p = mask_center(tgt_data.cropped_seg);
+		std::cout << "scale:" << tgt_data.scale << std::endl;
+		cv::Point cropped_in_origin = cv::Point(tgt_data.scaled_bbox.x + tgt_data.scaled_bbox.width/2, tgt_data.scaled_bbox.y + tgt_data.scaled_bbox.height/2);
+		cv::Point cropped_mask_center = mask_center(tgt_data.cropped_seg) * 1.0/tgt_data.scale;
+		cv::Point cropped_center = cv::Point(tgt_data.cropped_seg.cols/2, tgt_data.cropped_seg.rows/2) * 1.0/tgt_data.scale;
+		cv::Point p = cropped_mask_center - cropped_center + cropped_in_origin;
 		std::cout << "center:" << p << std::endl;
-		cv::seamlessClone(warpped_img, tgt_data.cropped_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
+		//cv::seamlessClone(warpped_img, tgt_data.cropped_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
+		cv::seamlessClone(warpped_img, tgt_data.scaled_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
 		writeImage("cloned.jpg", blended);
 
 		return cv::Mat();
