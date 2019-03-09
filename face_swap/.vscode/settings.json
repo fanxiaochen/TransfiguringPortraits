@@ -14,6 +14,7 @@
         "thread": "cpp",
         "tuple": "cpp",
         "chrono": "cpp",
-        "future": "cpp"
+        "future": "cpp",
+        "memory": "cpp"
     }
 }

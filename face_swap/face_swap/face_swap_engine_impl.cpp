@@ -348,9 +348,12 @@ namespace face_swap
 		}
 
 		// Crop landmarks
+		//std::cout << "show landmarks" << std::endl;
+		// landmarks: x --> width, y --> height
 		face_data.cropped_landmarks = face_data.scaled_landmarks;
 		for (cv::Point& p : face_data.cropped_landmarks)
 		{
+			//std::cout << "lm:" << "[" << p.x << "," << p.y << "]" << std::endl;
 			p.x -= face_data.scaled_bbox.x;
 			p.y -= face_data.scaled_bbox.y;
 		}
@@ -375,8 +378,8 @@ namespace face_swap
 		// 2d landmarks
 		landmarks(face_data);
 
-	//	// 3d shape coefficients and pose
-	//	shape(face_data);
+		// 3d shape coefficients and pose
+		//shape(face_data);
 
 
 		return true;
@@ -387,8 +390,39 @@ namespace face_swap
 		// compare 2d segmentation map and 3d shape and pose
 		auto src_shapes = src_data.shape_coefficients;
 		auto src_expr = src_data.expr_coefficients;
+		auto src_r = src_data.vecR;
+		auto src_t = src_data.vecT;
+		auto src_k = src_data.K;
 		auto tgt_shapes = tgt_data.shape_coefficients;
 		auto tgt_expr = tgt_data.expr_coefficients;
+		auto tgt_r = tgt_data.vecR;
+		auto tgt_t = tgt_data.vecT;
+		auto tgt_k = tgt_data.K;
+
+
+
+		std::cout << "src_shapes:" << std::endl;
+		std::cout << src_shapes << std::endl;
+		std::cout << "src_expr:" << std::endl;
+		std::cout << src_expr << std::endl;
+		std::cout << "src_r:" << std::endl;
+		std::cout << src_r << std::endl;
+		std::cout << "src_t:" << std::endl;
+		std::cout << src_t << std::endl;
+		std::cout << "src_k:" << std::endl;
+		std::cout << src_k << std::endl;
+
+		std::cout << "tgt_shapes:" << std::endl;
+		std::cout << tgt_shapes << std::endl;
+		std::cout << "tgt_expr:" << std::endl;
+		std::cout << tgt_expr << std::endl;
+		std::cout << "tgt_r:" << std::endl;
+		std::cout << tgt_r << std::endl;
+		std::cout << "tgt_t:" << std::endl;
+		std::cout << tgt_t << std::endl;
+		std::cout << "tgt_k:" << std::endl;
+		std::cout << tgt_k << std::endl;
+		
 
 		return true;
 	}
@@ -413,13 +447,13 @@ namespace face_swap
 
 		//cv::Mat t = cv::estimateAffinePartial2D(hull_src, hull_tgt);
 		cv::Mat t;
-		computeRigid(hull_src, hull_tgt, t);
+		computeRigid(hull_src, hull_tgt, t, false);
 	//	t.at<double>(0, 1) = - t.at<double>(0, 1);
 	//	t.at<double>(1, 0) = - t.at<double>(1, 0);
-	//	std::cout << t << std::endl;
-	//	cv::Mat warpped;
-	//	cv::warpAffine(src_data.cropped_img, warpped, t, cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-	//	writeImage("warpped.jpg", warpped);
+		std::cout << t << std::endl;
+		cv::Mat warpped;
+		cv::warpAffine(src_data.cropped_img, warpped, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+		writeImage("warpped.jpg", warpped);
 
 		writeImage("src_seg.png",src_data.cropped_seg);
 		writeImage("src_face.png",src_data.cropped_img);
@@ -553,13 +587,13 @@ namespace face_swap
 		if ((srcPoints.size() < 2) || (srcPoints.size() != dstPoints.size()))
 			return false;
 		
-		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange = false)
+		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange)
 		{
 			cv::Mat_<cv::Vec2d> m(cv::Size(1, points.size()));
 			for (int i = 0; i < points.size(); ++ i)
 			{
 				if (xyExchange)
-					m(i) = cv::Vec2d(points[i].y, points[i].x); // here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
+					m(i) = cv::Vec2d(points[i].y, points[i].x); 
 				else 
 					m(i) = cv::Vec2d(points[i].x, points[i].y); 
 			}
@@ -618,11 +652,22 @@ namespace face_swap
 		cv::Mat_<double> u, s, vh;
 		cv::SVD::compute(C, s, u, vh);
 
-		cv::Mat_<double> R = u * vh;
+//		cv::Mat_<double> R = u * vh;
+		cv::Mat_<double> ut(2,2,0.0), v(2,2,0.0);
+		cv::transpose(vh, v);
+		cv::transpose(u, ut);
 
-		if (cv::determinant(R) < 0) {
-			R -= u.col(1) * (vh.row(1) * 2.0);
-		}
+		cv::Mat_<double> d(2, 2, 0.0);
+		d.at<double>(0, 0) = 1.0;
+		d.at<double>(1, 1) = cv::determinant(v*ut);
+		
+		cv::Mat_<double> R = v*d*ut;
+
+//		std::cout << R << std::endl;
+
+	//	if (cv::determinant(R) < 0) {
+	//		R -= u.col(1) * (vh.row(1) * 2.0);
+	//	}
 
 		double scale = sqrt(p2Rms / p1Rms);
     	R *= scale;
@@ -635,6 +680,7 @@ namespace face_swap
 //		transf = result.rowRange(0, 2);
 		transf = result;
 
+//		std::cout << "scale in rigid t:" << scale << std::endl;
 //		std::cout << source << std::endl;
 //		std::cout << srcM << std::endl;
 //		std::cout << C << std::endl;
@@ -653,14 +699,13 @@ namespace face_swap
 		if ((srcPoints.size() < 2) || (dstPoints.size() < 2))
 			return false;
 		
-		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange = true)
+		auto convert2Mat = [](const std::vector<cv::Point>& points, bool xyExchange = false)
 		{
 			cv::Mat_<float> m(cv::Size(2, points.size()));
 			for (int i = 0; i < points.size(); ++ i)
 			{
 				if (xyExchange)
 				{
-					// here exchange x and y, because later in AffineWarp a positive angle is counter-clockwise
 					m.at<float>(i, 0) = (float)points[i].y; 
 					m.at<float>(i, 1) = (float)points[i].x; 
 				}
@@ -674,8 +719,8 @@ namespace face_swap
 			return m;
 		};
 
-		cv::Mat_<float> source = convert2Mat(srcPoints);
-		cv::Mat_<float> target = convert2Mat(dstPoints);
+		cv::Mat_<float> source = convert2Mat(srcPoints, false);
+		cv::Mat_<float> target = convert2Mat(dstPoints, false);
 
 		auto knn = [](cv::Mat_<float> source, cv::flann::Index& kdtree)
 		{
@@ -718,13 +763,13 @@ namespace face_swap
 			auto dstP = std::get<1>(tuple);
 			computeRigid(srcP, dstP, t, false);
 
-			std::cout << "after rigid t:" << std::endl;
-			// transform source 
+	//		std::cout << "after rigid t:" << std::endl;
+	//		// transform source 
 
-			std::cout << "before:" << srcP[0].x << "," << srcP[0].y << std::endl;
-			std::cout << t << std::endl;
+	//		std::cout << "before:" << srcP[0].x << "," << srcP[0].y << std::endl;
+	//		std::cout << t << std::endl;
 			cv::transform(srcP, srcP, t.rowRange(0,2));
-			std::cout << "after:" << srcP[0].x << "," << srcP[0].y << std::endl;
+	//		std::cout << "after:" << srcP[0].x << "," << srcP[0].y << std::endl;
 		//	std::cout << "after transform" << std::endl;
 			total = t * total;
 		//	std::cout << "after accu" << std::endl;

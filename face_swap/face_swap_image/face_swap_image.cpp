@@ -132,7 +132,9 @@ int main(int argc, char* argv[])
 		
 		fs->estimate(src_data);
 		fs->estimate(tgt_data);
-		//fs->align(src_data, tgt_data);
+//		fs->align(src_data, tgt_data);
+		//fs->transfer(src_data, tgt_data);
+//		fs->compare(src_data, tgt_data);
 		fs->transfer(src_data, tgt_data);
 
     //     // Do face swap
