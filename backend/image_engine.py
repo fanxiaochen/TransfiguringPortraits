@@ -35,9 +35,11 @@ class BingImageEngine(ImageEngine):
                 print("image content url: {}".format(image_result.content_url))
                 img = Image.open(urlopen(image_result.thumbnail_url))
                 self.images.append(img)
+                return True
         else:
             self.msg = "No image results returned!"
             print("No image results returned!")
+            return False
 
 
 if __name__ == "__main__":

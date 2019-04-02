@@ -229,6 +229,44 @@ public:
 		return out;
 	}
 
+	bool compare(FaceData& src_data, FaceData& tgt_data)
+	{
+		face_swap::FaceData cpp_src_data, cpp_tgt_data;
+		convert_face_data(src_data, cpp_src_data);
+		convert_face_data(tgt_data, cpp_tgt_data);
+		bool ret = m_fs->compare(cpp_src_data, cpp_tgt_data);
+		convert_face_data(cpp_src_data, src_data);
+		convert_face_data(cpp_tgt_data, tgt_data);
+
+		return ret;
+	}
+
+	bool estimate(FaceData& face_data)
+	{
+		face_swap::FaceData cpp_face_data;
+		convert_face_data(face_data, cpp_face_data);
+		bool res = m_fs->estimate(cpp_face_data);
+		convert_face_data(cpp_face_data, face_data);
+
+		return res;
+	}
+
+	np::ndarray transfer(FaceData& src_data, FaceData& tgt_data)
+	{
+		face_swap::FaceData cpp_src_data, cpp_tgt_data;
+		convert_face_data(src_data, cpp_src_data);
+		convert_face_data(tgt_data, cpp_tgt_data);
+		cv::Mat rendered_img = m_fs->transfer(cpp_src_data, cpp_tgt_data);
+		convert_face_data(cpp_src_data, src_data);
+		convert_face_data(cpp_tgt_data, tgt_data);
+
+		// Output render image
+		p::tuple out_shape = p::make_tuple(rendered_img.rows, rendered_img.cols, rendered_img.channels());
+		np::ndarray out = np::empty(out_shape, np::dtype::get_builtin<unsigned char>());
+		memcpy(out.get_data(), rendered_img.data, rendered_img.total() * rendered_img.elemSize());
+		return out;
+	}
+
 private:
 	std::shared_ptr<face_swap::FaceSwapEngine> m_fs;
 };
@@ -251,8 +289,10 @@ bool write_face_data(const std::string& path, FaceData& face_data,
 	return face_swap::writeFaceData(path, io_face_data, overwrite);
 }
 
+
 BOOST_PYTHON_MODULE(face_swap_py)
 {
+
 	np::initialize();
 
 	p::class_<FaceData>("FaceData", p::init<p::optional<np::ndarray, np::ndarray>>())
@@ -284,6 +324,9 @@ BOOST_PYTHON_MODULE(face_swap_py)
 	p::class_<FaceSwap>("FaceSwap", p::init<std::string, std::string, std::string, std::string, std::string, std::string, std::string, std::string, p::optional<bool, bool, bool, int>>())
 		.def("process", &FaceSwap::process)
 		.def("swap", &FaceSwap::swap)
+		.def("compare", &FaceSwap::compare)
+		.def("estimate", &FaceSwap::estimate)
+		.def("transfer", &FaceSwap::transfer)
 		;
 
 	p::def("read_face_data", read_face_data);

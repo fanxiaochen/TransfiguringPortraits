@@ -1,6 +1,6 @@
 # Load the package that SWIG uses to generate Python
 find_package(PythonLibs REQUIRED)
-find_package(Boost REQUIRED python numpy)
+find_package(Boost REQUIRED python3 numpy3)
 
 # Target
 add_library(face_swap_py SHARED face_swap_py.cpp)
@@ -13,6 +13,8 @@ target_link_libraries(face_swap_py
 	${PYTHON_LIBRARIES}
 	${Boost_LIBRARIES}
 )
+message(${Boost_LIBRARIES})
+message(${PYTHON_LIBRARIES})
 set_target_properties(face_swap_py PROPERTIES
 		PREFIX ""
 	)
