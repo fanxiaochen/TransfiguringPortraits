@@ -1,5 +1,6 @@
 from flask import Flask
 from image_engine import BingImageEngine
+from swapper import *
 
 
 app = Flask(__name__)
