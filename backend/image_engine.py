@@ -1,4 +1,6 @@
 import os
+import cv2
+import numpy
 from azure.cognitiveservices.search.imagesearch import ImageSearchAPI
 from msrest.authentication import CognitiveServicesCredentials
 from urllib.request import urlopen
@@ -34,7 +36,7 @@ class BingImageEngine(ImageEngine):
                 print("image thumbnail url: {}".format(image_result.thumbnail_url))
                 print("image content url: {}".format(image_result.content_url))
                 img = Image.open(urlopen(image_result.thumbnail_url))
-                self.images.append(img)
+                self.images.append(cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR))
                 return True
         else:
             self.msg = "No image results returned!"

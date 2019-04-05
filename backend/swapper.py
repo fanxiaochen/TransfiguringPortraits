@@ -35,6 +35,7 @@ class Swapper:
     
     def set_image(self, img):
         self.src_img = fspy.FaceData(img)
+        self.fs_engine.estimate(self.src_img)
 
     def request_images(self, item):
         self.img_engine.request(item)
@@ -44,13 +45,16 @@ class Swapper:
         if self.src_img and self.cur_tgt:
         # invoke faceswapping (self.src_img, tgt_img) 
             swapped = self.fs_engine.transfer(self.src_img, self.cur_tgt)
+            print("swapped")
         return swapped
 
     def compare(self, idx):
         tgt_img = self.img_engine.iterate(idx)
         self.cur_tgt = fspy.FaceData(tgt_img)
+        self.fs_engine.estimate(self.cur_tgt)
         # invoke faceswapping (self.src_img, tgt_img) 
         ret = self.fs_engine.compare(self.src_img, self.cur_tgt)
+        #return True
         return ret
 
     def process_one(self, idx):

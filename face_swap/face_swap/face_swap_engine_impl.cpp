@@ -387,6 +387,7 @@ namespace face_swap
 
 	bool FaceSwapEngineImpl::compare(FaceData& src_data, FaceData& tgt_data)
 	{
+		return true;
 		// compare 2d segmentation map and 3d shape and pose
 		auto src_shapes = src_data.shape_coefficients;
 		auto src_expr = src_data.expr_coefficients;
