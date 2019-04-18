@@ -7,7 +7,26 @@ import Swap from './swap'
 
 import {
     createStackNavigator, 
-    createBottomTabNavigator
+    createAppContainer
 } from 'react-navigation'
+
+const AppNavigator = createStackNavigator({
+    Home: {
+      screen: TakePhoto,
+    },
+    Item: {
+      screen: Item,
+    },
+    Wait: {
+        screen: Waiting,
+    },
+    Swap: {
+        screen: Swap
+    }
+    }, {
+        initialRouteName: 'Home',
+    });
+  
+  export default createAppContainer(AppNavigator); 
 
 

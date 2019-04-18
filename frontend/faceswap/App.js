@@ -11,6 +11,8 @@ import {Platform, StyleSheet, Text, View} from 'react-native';
 import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 
+import createAppContainer from './src'
+
 
 const serverUrl = 'http://localhost:5000';
 const http = axios.create({
