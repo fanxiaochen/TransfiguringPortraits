@@ -1,9 +1,9 @@
-import React from 'react'
 
 import TakePhoto from './photo'
 import Item from './item'
 import Waiting from './waiting'
 import Swap from './swap'
+import Welcome from './welcome'
 
 import {
     createStackNavigator, 
@@ -12,6 +12,9 @@ import {
 
 const AppNavigator = createStackNavigator({
     Home: {
+      screen: Welcome
+    },
+    Photo: {
       screen: TakePhoto,
     },
     Item: {
@@ -23,10 +26,18 @@ const AppNavigator = createStackNavigator({
     Swap: {
         screen: Swap
     }
-    }, {
-        initialRouteName: 'Home',
-    });
-  
-  export default createAppContainer(AppNavigator); 
+  }, 
+  {
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: 'orange'
+      }
+    }
+  });
+
+
+const AppContainer = createAppContainer(AppNavigator); 
+
+export default AppContainer;
 
 
