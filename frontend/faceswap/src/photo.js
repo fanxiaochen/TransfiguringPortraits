@@ -39,7 +39,7 @@ export default class TakePhoto extends React.Component {
                 avatarSource: source,
                 });
 
-                this.props.navigation.navigate('item');
+                this.props.navigation.navigate('Item');
             }
         });
     } 

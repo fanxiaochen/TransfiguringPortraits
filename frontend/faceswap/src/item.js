@@ -3,11 +3,13 @@ import React, {Component} from 'react'
 import {
     View,
     TextInput,
+    Text
 } from 'react-native'
 
 
 export default class Item extends React.Component {
-    constructor(){
+    constructor(props){
+        super(props);
         this.state = {
             item: ''
         }
