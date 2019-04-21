@@ -5,6 +5,7 @@ import {
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
+import {formImageBody} from './upload'
 
 const options = {
   title: 'Select Avatar',
@@ -14,7 +15,7 @@ const options = {
   },
 };
 
-export default class TakePhoto extends React.Component {
+export default class TakePhoto extends Component {
     constructor(props){
         super(props);
         this.state = {
@@ -30,7 +31,6 @@ export default class TakePhoto extends React.Component {
                 console.log('ImagePicker Error: ', response.error);
             } else {
                 const source = { uri: response.uri };
-                console.log(source);
             
                 // You can also display the image using data:
                 // const source = { uri: 'data:image/jpeg;base64,' + response.data };
@@ -38,6 +38,9 @@ export default class TakePhoto extends React.Component {
                 this.setState({
                 avatarSource: source,
                 });
+                console.log(this.state);
+
+                formImageBody(response.uri);
 
                 this.props.navigation.navigate('Item');
             }

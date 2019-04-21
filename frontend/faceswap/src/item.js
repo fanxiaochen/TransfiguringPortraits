@@ -8,13 +8,24 @@ import {
     StyleSheet
 } from 'react-native'
 
+import {http} from './upload'
 
-export default class Item extends React.Component {
+export default class Item extends Component {
     constructor(props){
         super(props);
         this.state = {
             item: ''
         }
+    }
+
+    _onSubmit(){
+        console.log(this.state)
+
+        http.post('/item',{
+            'item': this.state.item
+        });
+
+        this.props.navigation.navigate('Wait')
     }
 
     render() {
@@ -29,7 +40,8 @@ export default class Item extends React.Component {
                 {this.state.item.split(' ').map((word) => word && '🍕').join(' ')}
             </Text>
             <Button
-                onPress={()=>this.props.navigation.navigate('Wait')}
+                //onPress={()=>this.props.navigation.navigate('Wait')}
+                onPress={()=>this._onSubmit()}
                 title="submit"
             />
         </View>
