@@ -48,6 +48,7 @@ export default class TakePhoto extends React.Component {
         return (
             <View style={styles.container}>
                 <Button
+                    style={styles.button}
                     onPress={()=>this._onPressButton()}
                     title='Take a selfie'
                 />
@@ -58,9 +59,14 @@ export default class TakePhoto extends React.Component {
 
 const styles = StyleSheet.create({
   container: {
-   flex: 1,
-   justifyContent: 'center',
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F5FCFF',
   },
-  buttonContainer: {
-    margin: 20
-  }});
+  button: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+});
