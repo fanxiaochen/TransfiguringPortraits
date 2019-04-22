@@ -4,6 +4,7 @@ import Item from './item'
 import Waiting from './waiting'
 import Swap from './swap'
 import Welcome from './welcome'
+import Submit from './submit'
 
 import {
     createStackNavigator, 
@@ -13,6 +14,9 @@ import {
 const AppNavigator = createStackNavigator({
     Home: {
       screen: Welcome
+    },
+    Submit: {
+      screen: Submit,
     },
     Photo: {
       screen: TakePhoto,

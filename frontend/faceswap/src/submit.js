@@ -3,6 +3,8 @@ import React, {Component} from 'react'
 import {
     View,
     Button,
+    TextInput,
+    Text,
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
