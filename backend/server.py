@@ -47,23 +47,26 @@ def image():
 def swap():
     print(request.json)
     img = request.files["image"].read()
+    item = request.form['item']
+    print(img)
+    print(item)
 
-    npimg = np.fromstring(img, np.int8)
-    cvimg = cv2.imdecode(npimg, 1)
-    item = request.json["item"]
-    #swapper.set_image(image)
-    swapper.request_images(item)
-
-    results = list()
-    for idx in range(swapper.img_engine.length()):
-        pass
-     #   swapped_img = swapper.process_one(idx)
-     #   if not swapped_img:
-     #       results.append(swapped_img)
-
+#    npimg = np.fromstring(img, np.int8)
+#    cvimg = cv2.imdecode(npimg, 1)
+#    item = request.json["item"]
+#    #swapper.set_image(imageuri
+#    swapper.request_images(item)
+#
+#    results = list()
+#    for idx in range(swapper.img_engine.length()):
+#        pass
+#     #   swapped_img = swapper.process_one(idx)
+#     #   if not swapped_img:
+#     #       results.append(swapped_img)
+#
     return jsonify({
         "status": "OK",
-        "result": results
+#        "result": results
     })
 
 if __name__ == "__main__":

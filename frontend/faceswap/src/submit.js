@@ -8,7 +8,7 @@ import {
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
-import {formImageBody} from './upload'
+import {formImageBody, submitFormData} from './upload'
 
 const options = {
   title: 'Select Avatar',
@@ -57,6 +57,8 @@ export default class Submit extends Component {
      //   http.post('/item',{
      //       'item': this.state.item
      //   });
+        
+        submitFormData(this.state.avatarSource.uri, this.state.item)
 
         this.props.navigation.navigate('Wait')
     }

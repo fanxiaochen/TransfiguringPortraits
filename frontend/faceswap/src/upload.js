@@ -8,6 +8,28 @@ export const http = axios.create({
   baseURL: serverUrl
 });
 
+export const submitFormData = function(imagePath, item) {
+    let body = new FormData();
+    //imagePath = '/home/xiaochen/Workspace/TransfiguringPortraits';
+    imageFile = imagePath.substr(imagePath.lastIndexOf('/')+1)
+    imageName = imageFile.substr(0, imageFile.lastIndexOf('.'))
+    console.log(imageFile)
+    console.log(imageName)
+    //body.append('photo', {uri: imagePath,name: 'xi1',filename :'xi1.png',type: 'image/png'});
+    body.append('image', {uri: imagePath,name: imageName,filename :imageFile,type: 'image/jpeg'});
+    body.append('item', item);
+    //body.append('Content-Type', 'image/jpeg');
+
+    let config = {
+      headers:{'Content-Type':'multipart/form-data'}
+    }
+
+    http.post('/', body, config)
+    .then((res) => { console.log("response" +JSON.stringify(res)); })
+    .catch((e) => console.log(e))
+    .done()
+  }
+
 
 export const formImageBody = function(imagePath) {
     let body = new FormData();
