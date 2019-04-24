@@ -7,6 +7,54 @@ import {
 
 
 export default class Waiting extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+          status: 'WA'
+        }
+
+        this.mounted();
+    }
+
+    hasSwapped() {
+      http.get('/swapped')
+      .then((response) => {
+          this.setState({
+            status: response.data.status,
+          });
+          console.log(this.state);
+
+          //check if status is completed, if it is stop polling 
+          if(response.data.status === 'Accepted') {
+              clearInterval(this.pollInterval) //won't be polled anymore 
+              this.props.navigation.navigate('Swapped')
+          }
+        });
+
+    }
+
+ //   waitingForImage() {
+ //     http.get('/result', {
+ //       params: {
+ //         img_idx: 0
+ //       }
+ //     })
+ //     .then((response) => {
+ //         //check if status is completed, if it is stop polling 
+ //         if(response.data.status = 'completed') {
+ //               clearInterval(this.pollInterval) //won't be polled anymore 
+ //         }
+ //         this.status = response; 
+ //       });
+ //   }
+
+    mounted() {
+      if(this.state.status != 'Accepted') {
+        this.pollInterval = setInterval(this.hasSwapped, 2000) //save reference to the interval
+        setTimeout(() => {clearInterval(this.pollInterval)}, 36000000) //stop polling after an hour
+      }
+    }
+
     render(){
         return (
         <View>

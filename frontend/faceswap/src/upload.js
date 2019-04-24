@@ -30,6 +30,25 @@ export const submitFormData = function(imagePath, item) {
     .done()
   }
 
+export const waitingForImage = ()=>{
+  http.get('/result')
+  .then((response) => {
+      //check if status is completed, if it is stop polling 
+      if(response.data.status = 'completed') {
+            clearInterval(this.pollInterval) //won't be polled anymore 
+      }
+      this.status = response; 
+    });
+}
+
+export const mounted = ()=>{
+  //check if the status is completed, if not fetch data every 10minutes
+  if(this.status.status != 'completed') {
+    this.pollInterval = setInterval(waitingForImage, 2000) //save reference to the interval
+    setTimeout(() => {clearInterval(this.pollInterval)}, 36000000) //stop polling after an hour
+  }
+}
+
 
 export const formImageBody = function(imagePath) {
     let body = new FormData();
