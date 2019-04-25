@@ -5,6 +5,8 @@ import {
     StyleSheet
 } from 'react-native'
 
+import {http} from './upload'
+
 
 export default class Waiting extends Component {
     constructor(props){
@@ -17,6 +19,7 @@ export default class Waiting extends Component {
     }
 
     hasSwapped() {
+      console.log('try get');
       http.get('/swapped')
       .then((response) => {
           this.setState({
@@ -27,7 +30,7 @@ export default class Waiting extends Component {
           //check if status is completed, if it is stop polling 
           if(response.data.status === 'Accepted') {
               clearInterval(this.pollInterval) //won't be polled anymore 
-              this.props.navigation.navigate('Swapped')
+              this.props.navigation.navigate('Swap')
           }
         });
 
@@ -50,8 +53,8 @@ export default class Waiting extends Component {
 
     mounted() {
       if(this.state.status != 'Accepted') {
-        this.pollInterval = setInterval(this.hasSwapped, 2000) //save reference to the interval
-        setTimeout(() => {clearInterval(this.pollInterval)}, 36000000) //stop polling after an hour
+        this.pollInterval = setInterval(()=>{this.hasSwapped()}, 2000) //save reference to the interval
+        setTimeout(() => {clearInterval(this.pollInterval)}, 600000) //stop polling after an hour
       }
     }
 

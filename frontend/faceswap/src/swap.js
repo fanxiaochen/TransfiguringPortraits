@@ -5,8 +5,31 @@ import {
     StyleSheet
 } from 'react-native'
 
+import {http} from './upload'
+
 
 export default class Swap extends Component {
+    constructor(props){
+        super(props);
+        this.state = {
+          idx: 0
+        }
+
+        this.receiveImage();
+
+      }
+
+    receiveImage() {
+      http.get('/result', {
+        params: {
+          idx: this.state.idx
+        }
+      })
+      .then((response) => {
+          console.log(response);
+        });
+    }
+
     render(){
         return (
         <View>

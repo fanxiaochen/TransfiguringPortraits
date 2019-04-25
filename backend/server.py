@@ -1,4 +1,6 @@
 import threading
+import time
+import os
 from flask import Flask, request, jsonify, send_file
 import numpy as np
 import cv2
@@ -8,12 +10,15 @@ from swapper import *
 
 app = Flask(__name__)
 
-swapper = Swapper()
-swapper.start_img_engine()
-swapper.start_fs_engine()
+#swapper = Swapper()
+#swapper.start_img_engine()
+#swapper.start_fs_engine()
 
 swapped_list = []
 swapped_idx = 0
+image_cache = 'cache'
+if not os.path.exists(image_cache):
+    os.mkdir(image_cache)
 
 @app.route("/swapped", methods=["GET"])
 def has_swapped():
@@ -30,7 +35,8 @@ def has_swapped():
 @app.route("/result", methods=["GET"])
 def swapped_images():
     # send image back
-    img_idx = request.args.get('img_idx')
+    img_idx = int(request.args.get('idx'))
+    print(img_idx)
     if img_idx < len(swapped_list):
         return send_file(swapped_list[img_idx], mimetype='image/jpeg')
     else:
@@ -79,6 +85,17 @@ def swap():
 #    print(item)
 
     def swapping(img, item):
+        swapped_list.clear()
+        for i in range(5):
+            time.sleep(10)
+            img_file = os.path.join(image_cache, '%d.jpg' % i)
+            print(img_file)
+            npimg = np.fromstring(img, np.int8)
+            cvimg = cv2.imdecode(npimg, 1)
+            cv2.imwrite(img_file, cvimg)
+            swapped_list.append(img_file)
+        return
+
         swapped_list.clear()
         npimg = np.fromstring(img, np.int8)
         cvimg = cv2.imdecode(npimg, 1)
