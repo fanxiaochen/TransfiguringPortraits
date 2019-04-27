@@ -38,7 +38,12 @@ def swapped_images():
     img_idx = int(request.args.get('idx'))
     print(img_idx)
     if img_idx < len(swapped_list):
-        return send_file(swapped_list[img_idx], mimetype='image/jpeg')
+        return jsonify({
+        "status": "Success",
+        "url": os.path.join('/result', swapped_list[img_idx])
+        })
+
+        #return send_file(swapped_list[img_idx], mimetype='image/jpeg')
     else:
         return jsonify({
         "status": "WI",
