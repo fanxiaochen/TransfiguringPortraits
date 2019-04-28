@@ -1,7 +1,7 @@
 import threading
 import time
 import os
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify, send_file, url_for
 import numpy as np
 import cv2
 from image_engine import BingImageEngine
@@ -16,7 +16,7 @@ app = Flask(__name__)
 
 swapped_list = []
 swapped_idx = 0
-image_cache = 'cache'
+image_cache = 'static'
 if not os.path.exists(image_cache):
     os.mkdir(image_cache)
 
@@ -38,9 +38,16 @@ def swapped_images():
     img_idx = int(request.args.get('idx'))
     print(img_idx)
     if img_idx < len(swapped_list):
+        #img_url = os.path.join(request.url_root, )
+        re_url = url_for('static', filename=swapped_list[img_idx])
+        print(request.url_root)
+        img_url = os.path.join(request.url_root, re_url)
+        print(img_url)
+        img_url = request.url_root + re_url
+        print(img_url)
         return jsonify({
         "status": "Success",
-        "url": os.path.join('/result', swapped_list[img_idx])
+        "url": img_url
         })
 
         #return send_file(swapped_list[img_idx], mimetype='image/jpeg')
@@ -98,7 +105,8 @@ def swap():
             npimg = np.fromstring(img, np.int8)
             cvimg = cv2.imdecode(npimg, 1)
             cv2.imwrite(img_file, cvimg)
-            swapped_list.append(img_file)
+            swapped_list.append('%d.jpg' % i)
+#            swapped_list.append(img_file)
         return
 
         swapped_list.clear()
