@@ -1,7 +1,7 @@
 import threading
 import time
 import os
-from flask import Flask, request, jsonify, send_file, url_for
+from flask import Flask, request, jsonify, send_file, url_for, Response
 import numpy as np
 import cv2
 from image_engine import BingImageEngine
@@ -19,6 +19,13 @@ swapped_idx = 0
 image_cache = 'static'
 if not os.path.exists(image_cache):
     os.mkdir(image_cache)
+
+@app.route("/test", methods=["GET"])
+def test():
+    # send image back
+    path = 'home/xiaochen/Workspace/TransfiguringPortraits/backend/static/0.jpg'
+    resp = Response(open(path, 'rb'), mimetype="image/jpeg")
+    return resp
 
 @app.route("/swapped", methods=["GET"])
 def has_swapped():
@@ -40,11 +47,15 @@ def swapped_images():
     if img_idx < len(swapped_list):
         #img_url = os.path.join(request.url_root, )
         re_url = url_for('static', filename=swapped_list[img_idx])
+        #re_url = url_for('static', filename='0.jpg')
         print(request.url_root)
         img_url = os.path.join(request.url_root, re_url)
         print(img_url)
-        img_url = request.url_root + re_url
+        img_url = request.url_root + re_url[1:]
         print(img_url)
+      #  path = '/home/xiaochen/Workspace/TransfiguringPortraits/backend/static/0.jpg'
+      #  resp = Response(open(path, 'rb'), mimetype="image/jpeg")
+      #  return resp
         return jsonify({
         "status": "Success",
         "url": img_url
@@ -130,3 +141,4 @@ def swap():
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')
      app.run(host='192.168.31.126')
+     #app.run(host='127.0.0.1',port=4949, debug=True)
