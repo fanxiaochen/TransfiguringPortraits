@@ -5,23 +5,46 @@ import {
     Button,
     Image,
     Alert,
+    Dimensions,
     StyleSheet
 } from 'react-native'
 
 import {http} from './upload'
 
+let screenWidth = Dimensions.get('window').width;
+let screenHeight = Dimensions.get('window').height;
 
 export default class Swap extends Component {
     constructor(props){
         super(props);
         this.state = {
           next_idx: 0,
-          cur_url: ''
+          cur_url: '',
+          height: 0,
+          width: 0
         }
 
         this.receiveImage();
 
       }
+
+    resizeImage() {
+      //const img = Image.resolveAssetSource(require(this.state.cur_url));
+      Image.getSize(this.state.cur_url, (w, h)=>{
+       // const h = img.height;
+       // const w = img.width;
+       console.log(w)
+       console.log(h)
+       const resizedHeight = screenWidth * h / w; 
+       console.log(screenWidth)
+       console.log(resizedHeight)
+        this.setState(
+          {
+            width: screenWidth, 
+            height: resizedHeight
+          });
+      });
+    }
 
     receiveImage() {
       http.get('/result', {
@@ -38,7 +61,9 @@ export default class Swap extends Component {
               this.setState({
                 next_idx: cur_idx,
                 cur_url: response.data.url
+                //cur_url: 'https://reactnativecode.com/wp-content/uploads/2018/01/Error_Image_Android.png' 
               });
+              this.resizeImage();
           }
           else {
             // text wait a while
@@ -59,7 +84,7 @@ export default class Swap extends Component {
         <View>
             <Text style={styles.swap}>Show swapped results here</Text>
             <Image
-              style={{width: 50, height: 50}}
+              style={{width: this.state.width, height: this.state.height}}
               source={{uri: this.state.cur_url}}
               //source={{uri: "http://192.168.31.126:5000/static/0.jpg"}}
             />
@@ -79,11 +104,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
-  },
-  swap: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
   },
   button: {
     fontSize: 20,

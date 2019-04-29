@@ -20,13 +20,6 @@ image_cache = 'static'
 if not os.path.exists(image_cache):
     os.mkdir(image_cache)
 
-@app.route("/test", methods=["GET"])
-def test():
-    # send image back
-    path = 'home/xiaochen/Workspace/TransfiguringPortraits/backend/static/0.jpg'
-    resp = Response(open(path, 'rb'), mimetype="image/jpeg")
-    return resp
-
 @app.route("/swapped", methods=["GET"])
 def has_swapped():
     # send image back
