@@ -5,7 +5,7 @@ import {
     StyleSheet
 } from 'react-native'
 
-import {http} from './upload'
+import {http, uuid, curItem} from './upload'
 
 
 export default class Waiting extends Component {
@@ -20,7 +20,12 @@ export default class Waiting extends Component {
 
     hasSwapped() {
       console.log('try get');
-      http.get('/swapped')
+      http.get('/swapped', {
+        params: {
+          'uuid': uuid,
+          'item': curItem 
+        }
+      })
       .then((response) => {
           this.setState({
             status: response.data.status,

@@ -49,7 +49,9 @@ export default class Swap extends Component {
     receiveImage() {
       http.get('/result', {
         params: {
-          idx: this.state.next_idx
+          idx: this.state.next_idx,
+          'uuid': uuid,
+          'item': item
         }
       })
       .then((response) => {

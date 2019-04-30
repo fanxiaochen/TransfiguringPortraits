@@ -1,5 +1,6 @@
 import threading
 import time
+import json
 import os
 from flask import Flask, request, jsonify, send_file, url_for, Response
 import numpy as np
@@ -14,16 +15,32 @@ app = Flask(__name__)
 #swapper.start_img_engine()
 #swapper.start_fs_engine()
 
+user_cache = 'user.json'
+if not os.path.exists(user_cache):
+    with open(user_cache,'w') as f:
+        json.dump(dict(),f)
+
+with open(user_cache,"r") as f:
+    uuid_list = json.load(f)
+
+
 swapped_list = []
-swapped_idx = 0
-image_cache = 'static'
+swapped_idx = []
+
+static_cache = 'static'
+if not os.path.exists(static_cache):
+    os.mkdir(static_cache)
+
+image_cache = os.path.join(static_cache, 'image')
 if not os.path.exists(image_cache):
     os.mkdir(image_cache)
 
 @app.route("/swapped", methods=["GET"])
 def has_swapped():
     # send image back
-    if len(swapped_list) > 0:
+    uuid = request.args.get('uuid')
+    item = request.args.get('item')
+    if len(uuid_list[uuid][item]) > 0:
         return jsonify({
         "status": "Accepted",
         })
@@ -35,11 +52,14 @@ def has_swapped():
 @app.route("/result", methods=["GET"])
 def swapped_images():
     # send image back
+    uuid = request.args.get('uuid')
+    item = request.args.get('item')
     img_idx = int(request.args.get('idx'))
     print(img_idx)
-    if img_idx < len(swapped_list):
+    if img_idx < len(uuid_list[uuid][item]):
         #img_url = os.path.join(request.url_root, )
-        re_url = url_for('static', filename=swapped_list[img_idx])
+        uuid_cache = os.path.join(image_cache, uuid)
+        re_url = url_for(uuid_cache, filename=uuid_list[uuid][item][img_idx])
         #re_url = url_for('static', filename='0.jpg')
         print(request.url_root)
         img_url = os.path.join(request.url_root, re_url)
@@ -60,57 +80,72 @@ def swapped_images():
         "status": "WI",
     })
 
-@app.route("/item", methods=["POST"])
-def item():
-    item = request.json["item"]
- #   swapper.request_images(item)
-    print('received item')
-
-    results = list()
- #   #for idx in range(swapper.img_engine.length()):
- #   for idx in range(1):
- #       swapped_img = swapper.process_one(idx)
- #       print(type(swapped_img))
- #       if swapped_img:
- #           results.append(swapped_img)
- #           cv2.imshow(swapped_img)
- #           cv2.waitKey(0)
-
-    return jsonify({
-        "status": "OK",
-        "result": results
-    })
-
-@app.route("/image", methods=["POST"])
-def image():
-    img = request.files["image"].read()
-    npimg = np.fromstring(img, np.int8)
-    cvimg = cv2.imdecode(npimg, 1)
-    #swapper.set_image(cvimg)
-    print('received image')
-    return jsonify({
-        "status": "OK",
-    })
+#@app.route("/item", methods=["POST"])
+#def item():
+#    item = request.json["item"]
+# #   swapper.request_images(item)
+#    print('received item')
+#
+#    results = list()
+# #   #for idx in range(swapper.img_engine.length()):
+# #   for idx in range(1):
+# #       swapped_img = swapper.process_one(idx)
+# #       print(type(swapped_img))
+# #       if swapped_img:
+# #           results.append(swapped_img)
+# #           cv2.imshow(swapped_img)
+# #           cv2.waitKey(0)
+#
+#    return jsonify({
+#        "status": "OK",
+#        "result": results
+#    })
+#
+#@app.route("/image", methods=["POST"])
+#def image():
+#    img = request.files["image"].read()
+#    npimg = np.fromstring(img, np.int8)
+#    cvimg = cv2.imdecode(npimg, 1)
+#    #swapper.set_image(cvimg)
+#    print('received image')
+#    return jsonify({
+#        "status": "OK",
+#    })
 
 @app.route("/", methods=["POST"])
 def swap():
 #    print(request.json)
     img = request.files["image"].read()
     item = request.form['item']
+    uuid = request.form['uuid']
 #    print(img)
 #    print(item)
 
-    def swapping(img, item):
-        swapped_list.clear()
+    def swapping(uuid, img, item):
         for i in range(5):
             time.sleep(10)
-            img_file = os.path.join(image_cache, '%d.jpg' % i)
+            
+            uuid_cache = os.path.join(image_cache, uuid) 
+            if not os.path.exists(uuid_cache):
+                os.mkdir(uuid_cache)
+                uuid_data = dict()
+                uuid_data[item]= [] 
+#                uuid_data['img_idx']= 0 
+                uuid_list[uuid] = uuid_data
+
+            img_name = '%s-%d.jpg' % (item, i+len(uuid_list[uuid][item]))
+            img_file = os.path.join(uuid_cache, img_name)
             print(img_file)
             npimg = np.fromstring(img, np.int8)
             cvimg = cv2.imdecode(npimg, 1)
             cv2.imwrite(img_file, cvimg)
-            swapped_list.append('%d.jpg' % i)
+            uuid_list[uuid][item].append(img_name)
+#            swapped_list.append('%d.jpg' % i)
 #            swapped_list.append(img_file)
+
+            # I need better way to save
+            with open(user_cache, "w") as f:
+                json.dump(uuid_list, f)
         return
 
         swapped_list.clear()

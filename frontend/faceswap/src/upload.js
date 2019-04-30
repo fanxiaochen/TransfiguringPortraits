@@ -2,11 +2,16 @@
 import axios from 'axios';
 
 
+
 //export const serverUrl = 'http://127.0.0.1:5000';
 export const serverUrl = 'http://192.168.31.126:5000';
 export const http = axios.create({
   baseURL: serverUrl
 });
+
+export const uuidGen = require('react-native-uuid');
+export const uuid = uuidGen.v1();
+export let curItem = '';
 
 export const submitFormData = function(imagePath, item) {
     let body = new FormData();
@@ -18,6 +23,7 @@ export const submitFormData = function(imagePath, item) {
     //body.append('photo', {uri: imagePath,name: 'xi1',filename :'xi1.png',type: 'image/png'});
     body.append('image', {uri: imagePath,name: imageName,filename :imageFile,type: 'image/jpeg'});
     body.append('item', item);
+    body.append('uuid', uuid);
     //body.append('Content-Type', 'image/jpeg');
 
     let config = {
