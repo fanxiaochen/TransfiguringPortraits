@@ -22,8 +22,8 @@ export default class Waiting extends Component {
       console.log('try get');
       http.get('/swapped', {
         params: {
-          'uuid': uuid,
-          'item': curItem 
+          'uuid': global.uuid,
+          'item': global.curItem 
         }
       })
       .then((response) => {

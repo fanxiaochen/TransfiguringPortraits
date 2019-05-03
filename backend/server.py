@@ -40,7 +40,7 @@ def has_swapped():
     # send image back
     uuid = request.args.get('uuid')
     item = request.args.get('item')
-    if len(uuid_list[uuid][item]) > 0:
+    if uuid in uuid_list and item in uuid_list[uuid] and len(uuid_list[uuid][item]) > 0:
         return jsonify({
         "status": "Accepted",
         })
@@ -58,14 +58,17 @@ def swapped_images():
     print(img_idx)
     if img_idx < len(uuid_list[uuid][item]):
         #img_url = os.path.join(request.url_root, )
-        uuid_cache = os.path.join(image_cache, uuid)
-        re_url = url_for(uuid_cache, filename=uuid_list[uuid][item][img_idx])
+        img_url = os.path.join(image_cache, uuid, uuid_list[uuid][item][img_idx])
+        print(img_url)
+        
+        #uuid_cache = os.path.join('image', uuid)
+        #re_url = url_for('static', filename=os.path.join(uuid_cache, uuid_list[uuid][item][img_idx]))
         #re_url = url_for('static', filename='0.jpg')
         print(request.url_root)
-        img_url = os.path.join(request.url_root, re_url)
-        print(img_url)
-        img_url = request.url_root + re_url[1:]
-        print(img_url)
+        img_url = os.path.join(request.url_root, img_url)
+      #  print(img_url)
+      #  img_url = request.url_root + re_url[1:]
+      #  print(img_url)
       #  path = '/home/xiaochen/Workspace/TransfiguringPortraits/backend/static/0.jpg'
       #  resp = Response(open(path, 'rb'), mimetype="image/jpeg")
       #  return resp
@@ -133,7 +136,7 @@ def swap():
 #                uuid_data['img_idx']= 0 
                 uuid_list[uuid] = uuid_data
 
-            img_name = '%s-%d.jpg' % (item, i+len(uuid_list[uuid][item]))
+            img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
             img_file = os.path.join(uuid_cache, img_name)
             print(img_file)
             npimg = np.fromstring(img, np.int8)
@@ -159,7 +162,7 @@ def swap():
             if not swapped_img:
                 swapped_list.append(swapped_img)
     
-    thread = threading.Thread(target=swapping, kwargs={'img': img, 'item': item})
+    thread = threading.Thread(target=swapping, kwargs={'uuid': uuid, 'img': img, 'item': item})
     thread.start()
 
     return jsonify({

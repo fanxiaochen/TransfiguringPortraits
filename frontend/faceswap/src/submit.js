@@ -8,7 +8,7 @@ import {
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
-import {formImageBody, submitFormData, curItem} from './upload'
+import {formImageBody, submitFormData, curItem, uuidGen} from './upload'
 
 const options = {
   title: 'Select Avatar',
@@ -24,6 +24,7 @@ export default class Submit extends Component {
         this.state = {
             avatarSource: {},
             item: '',
+            uuid: ''
         }
     }
     
@@ -58,10 +59,15 @@ export default class Submit extends Component {
      //       'item': this.state.item
      //   });
         
-        curItem = this.state.item;
-        submitFormData(this.state.avatarSource.uri, this.state.item)
+        if (this.state.uuid === ''){
+            this.state.uuid = uuidGen.v1();
+        }
+        global.curItem = this.state.item;
+        global.uuid = this.state.uuid;
 
-        this.props.navigation.navigate('Wait')
+        submitFormData(this.state.avatarSource.uri, this.state.item, this.state.uuid);
+
+        this.props.navigation.navigate('Wait');
     }
 
 

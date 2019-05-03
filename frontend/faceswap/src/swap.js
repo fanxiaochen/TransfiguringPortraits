@@ -50,8 +50,8 @@ export default class Swap extends Component {
       http.get('/result', {
         params: {
           idx: this.state.next_idx,
-          'uuid': uuid,
-          'item': item
+          'uuid': global.uuid,
+          'item': global.curItem
         }
       })
       .then((response) => {

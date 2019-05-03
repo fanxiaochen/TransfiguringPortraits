@@ -10,10 +10,10 @@ export const http = axios.create({
 });
 
 export const uuidGen = require('react-native-uuid');
-export const uuid = uuidGen.v1();
-export let curItem = '';
+//global.uuid = uuidGen.v1();
+//global.curItem = '';
 
-export const submitFormData = function(imagePath, item) {
+export const submitFormData = function(imagePath, item, uuid) {
     let body = new FormData();
     //imagePath = '/home/xiaochen/Workspace/TransfiguringPortraits';
     imageFile = imagePath.substr(imagePath.lastIndexOf('/')+1)
