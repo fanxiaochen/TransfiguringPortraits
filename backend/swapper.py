@@ -30,46 +30,47 @@ class Swapper:
                         generic, with_expr, with_gpu, gpu_device_id)
     
     def start_img_engine(self):
-        key = "f956df8f4aa74af396fbc1a5072e7960"
+        key = "3e49862cde1443c3b88b0538bb42b6cd"
         self.img_engine = BingImageEngine(key)
     
     def set_image(self, img):
-        self.src_img = fspy.FaceData(img)
-        self.fs_engine.estimate(self.src_img)
+        img = fspy.FaceData(img)
+        self.fs_engine.estimate(img)
+        return img
 
     def request_images(self, item):
-        self.img_engine.request(item)
+        return self.img_engine.request(item)
 
-    def swap(self):
-        swapped = self.src_img
-        if self.src_img and self.cur_tgt:
+    def swap(self, src_img, cur_tgt):
+        swapped = src_img
+        if src_img and cur_tgt:
         # invoke faceswapping (self.src_img, tgt_img) 
-            swapped = self.fs_engine.transfer(self.src_img, self.cur_tgt)
+            swapped = self.fs_engine.transfer(src_img, cur_tgt)
             print("swapped")
         return swapped
 
-    def compare(self, idx):
-        tgt_img = self.img_engine.iterate(idx)
-        self.cur_tgt = fspy.FaceData(tgt_img)
-        self.fs_engine.estimate(self.cur_tgt)
+    def compare(self, src_img, tgt_img):
+        cur_tgt = fspy.FaceData(tgt_img)
+        self.fs_engine.estimate(cur_tgt)
         # invoke faceswapping (self.src_img, tgt_img) 
-        ret = self.fs_engine.compare(self.src_img, self.cur_tgt)
+        ret = self.fs_engine.compare(src_img, cur_tgt)
         #return True
         return ret
 
-    def process_one(self, idx):
+    def process_one(self, src_img, tgt_img):
         output = None
-        if self.compare(idx):
-            output = self.swap()
+        if self.compare(src_img, tgt_img):
+            output = self.swap(src_img, tgt_img)
         return output
 
     def process(self, img, item):
-        self.set_image(img)
-        if not self.request_images(item):
+        src_img = self.set_image(img)
+        tgt_imgs = self.request_images(item)
+        if not tgt_imgs:
             print("Cannot search for images!")
 
-        for idx in range(self.img_engine.length()):
-            self.process_one(idx)
+        for idx in range(len(tgt_imgs)):
+            self.process_one(src_img, tgt_imgs[idx])
 
 
 

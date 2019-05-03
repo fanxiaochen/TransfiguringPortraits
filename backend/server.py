@@ -11,9 +11,9 @@ from swapper import *
 
 app = Flask(__name__)
 
-#swapper = Swapper()
-#swapper.start_img_engine()
-#swapper.start_fs_engine()
+swapper = Swapper()
+swapper.start_img_engine()
+swapper.start_fs_engine()
 
 user_cache = 'user.json'
 if not os.path.exists(user_cache):
@@ -23,9 +23,6 @@ if not os.path.exists(user_cache):
 with open(user_cache,"r") as f:
     uuid_list = json.load(f)
 
-
-swapped_list = []
-swapped_idx = []
 
 static_cache = 'static'
 if not os.path.exists(static_cache):
@@ -151,16 +148,30 @@ def swap():
                 json.dump(uuid_list, f)
         return
 
-        swapped_list.clear()
+        uuid_cache = os.path.join(image_cache, uuid) 
+        if not os.path.exists(uuid_cache):
+            os.mkdir(uuid_cache)
+            uuid_data = dict()
+            uuid_data[item]= [] 
+#                uuid_data['img_idx']= 0 
+            uuid_list[uuid] = uuid_data
+
         npimg = np.fromstring(img, np.int8)
         cvimg = cv2.imdecode(npimg, 1)
-        swapper.set_image(cvimg)
-        swapper.request_images(item)
+        src_img = swapper.set_image(cvimg)
+        tgt_imgs = swapper.request_images(item)
 
-        for idx in range(swapper.img_engine.length()):
-            swapped_img = swapper.process_one(idx)
+        for idx in range(len(tgt_imgs)):
+            swapped_img = swapper.process_one(src_img, tgt_imgs[idx])
             if not swapped_img:
-                swapped_list.append(swapped_img)
+                img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
+                img_file = os.path.join(uuid_cache, img_name)
+                cv2.imwrite(img_file, swapped_img)
+                uuid_list[uuid][item].append(img_name)
+                # I need better way to save
+                with open(user_cache, "w") as f:
+                    json.dump(uuid_list, f)
+        return
     
     thread = threading.Thread(target=swapping, kwargs={'uuid': uuid, 'img': img, 'item': item})
     thread.start()
