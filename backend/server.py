@@ -122,31 +122,31 @@ def swap():
 #    print(item)
 
     def swapping(uuid, img, item):
-        for i in range(5):
-            time.sleep(10)
-            
-            uuid_cache = os.path.join(image_cache, uuid) 
-            if not os.path.exists(uuid_cache):
-                os.mkdir(uuid_cache)
-                uuid_data = dict()
-                uuid_data[item]= [] 
-#                uuid_data['img_idx']= 0 
-                uuid_list[uuid] = uuid_data
-
-            img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
-            img_file = os.path.join(uuid_cache, img_name)
-            print(img_file)
-            npimg = np.fromstring(img, np.int8)
-            cvimg = cv2.imdecode(npimg, 1)
-            cv2.imwrite(img_file, cvimg)
-            uuid_list[uuid][item].append(img_name)
-#            swapped_list.append('%d.jpg' % i)
-#            swapped_list.append(img_file)
-
-            # I need better way to save
-            with open(user_cache, "w") as f:
-                json.dump(uuid_list, f)
-        return
+#        for i in range(5):
+#            time.sleep(10)
+#            
+#            uuid_cache = os.path.join(image_cache, uuid) 
+#            if not os.path.exists(uuid_cache):
+#                os.mkdir(uuid_cache)
+#                uuid_data = dict()
+#                uuid_data[item]= [] 
+##                uuid_data['img_idx']= 0 
+#                uuid_list[uuid] = uuid_data
+#
+#            img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
+#            img_file = os.path.join(uuid_cache, img_name)
+#            print(img_file)
+#            npimg = np.fromstring(img, np.int8)
+#            cvimg = cv2.imdecode(npimg, 1)
+#            cv2.imwrite(img_file, cvimg)
+#            uuid_list[uuid][item].append(img_name)
+##            swapped_list.append('%d.jpg' % i)
+##            swapped_list.append(img_file)
+#
+#            # I need better way to save
+#            with open(user_cache, "w") as f:
+#                json.dump(uuid_list, f)
+#        return
 
         uuid_cache = os.path.join(image_cache, uuid) 
         if not os.path.exists(uuid_cache):
@@ -155,15 +155,24 @@ def swap():
             uuid_data[item]= [] 
 #                uuid_data['img_idx']= 0 
             uuid_list[uuid] = uuid_data
+            # I need better way to save
+            with open(user_cache, "w") as f:
+                json.dump(uuid_list, f)
 
         npimg = np.fromstring(img, np.int8)
         cvimg = cv2.imdecode(npimg, 1)
-        src_img = swapper.set_image(cvimg)
+        img_h, img_w, _ = cvimg.shape
+        scale = int(img_w / 1000) + 4
+        resized = (int(img_w / scale), int(img_h /scale))
+        print(resized)
+        scaled_img = cv2.resize(cvimg, resized)
+        src_img = swapper.set_image(scaled_img)
         tgt_imgs = swapper.request_images(item)
 
         for idx in range(len(tgt_imgs)):
-            swapped_img = swapper.process_one(src_img, tgt_imgs[idx])
-            if not swapped_img:
+            tgt_img = swapper.set_image(tgt_imgs[idx])
+            swapped_img = swapper.process_one(src_img, tgt_img)
+            if swapped_img.size != 0:
                 img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
                 img_file = os.path.join(uuid_cache, img_name)
                 cv2.imwrite(img_file, swapped_img)

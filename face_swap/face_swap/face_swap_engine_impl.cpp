@@ -566,7 +566,7 @@ namespace face_swap
 		cv::seamlessClone(warpped_img, tgt_data.scaled_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
 		writeImage("cloned.jpg", blended);
 
-		return cv::Mat();
+		return blended;
 	}
 
 
