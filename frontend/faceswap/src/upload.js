@@ -10,8 +10,6 @@ export const http = axios.create({
 });
 
 export const uuidGen = require('react-native-uuid');
-//global.uuid = uuidGen.v1();
-//global.curItem = '';
 
 export const submitFormData = function(imagePath, item, uuid) {
     let body = new FormData();

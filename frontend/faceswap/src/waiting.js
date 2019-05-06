@@ -5,7 +5,7 @@ import {
     StyleSheet
 } from 'react-native'
 
-import {http, uuid, curItem} from './upload'
+import {http} from './upload'
 
 
 export default class Waiting extends Component {
@@ -40,21 +40,6 @@ export default class Waiting extends Component {
         });
 
     }
-
- //   waitingForImage() {
- //     http.get('/result', {
- //       params: {
- //         img_idx: 0
- //       }
- //     })
- //     .then((response) => {
- //         //check if status is completed, if it is stop polling 
- //         if(response.data.status = 'completed') {
- //               clearInterval(this.pollInterval) //won't be polled anymore 
- //         }
- //         this.status = response; 
- //       });
- //   }
 
     mounted() {
       if(this.state.status != 'Accepted') {

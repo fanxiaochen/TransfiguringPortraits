@@ -1,6 +1,4 @@
 
-import TakePhoto from './photo'
-import Item from './item'
 import Waiting from './waiting'
 import Swap from './swap'
 import Welcome from './welcome'
@@ -17,12 +15,6 @@ const AppNavigator = createStackNavigator({
     },
     Submit: {
       screen: Submit,
-    },
-    Photo: {
-      screen: TakePhoto,
-    },
-    Item: {
-      screen: Item,
     },
     Wait: {
         screen: Waiting,

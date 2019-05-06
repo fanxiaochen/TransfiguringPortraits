@@ -14,7 +14,6 @@ export default class Welcome extends Component {
       <View style={styles.container}>
         <Text style={styles.welcome}>A simple demo of face swapping</Text>
         <Button
-            //onPress={()=>this.props.navigation.navigate('Photo')}
             onPress={()=>this.props.navigation.navigate('Submit')}
             title="Let's start"
         />

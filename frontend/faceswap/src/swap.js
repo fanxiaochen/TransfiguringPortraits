@@ -29,15 +29,8 @@ export default class Swap extends Component {
       }
 
     resizeImage() {
-      //const img = Image.resolveAssetSource(require(this.state.cur_url));
       Image.getSize(this.state.cur_url, (w, h)=>{
-       // const h = img.height;
-       // const w = img.width;
-       console.log(w)
-       console.log(h)
        const resizedHeight = screenWidth * h / w; 
-       console.log(screenWidth)
-       console.log(resizedHeight)
         this.setState(
           {
             width: screenWidth, 
@@ -88,7 +81,6 @@ export default class Swap extends Component {
             <Image
               style={{width: this.state.width, height: this.state.height}}
               source={{uri: this.state.cur_url}}
-              //source={{uri: "http://192.168.31.126:5000/static/0.jpg"}}
             />
             <Button
                 style={styles.button}

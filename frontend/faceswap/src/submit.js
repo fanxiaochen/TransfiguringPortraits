@@ -8,7 +8,7 @@ import {
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
-import {formImageBody, submitFormData, curItem, uuidGen} from './upload'
+import {submitFormData, uuidGen} from './upload'
 
 const options = {
   title: 'Select Avatar',
@@ -28,7 +28,7 @@ export default class Submit extends Component {
         }
     }
     
-    _onTakePhoto() {
+    onTakePhoto() {
         ImagePicker.launchCamera(options, (response) => {
             if (response.didCancel) {
                 console.log('User cancelled image picker');
@@ -52,13 +52,9 @@ export default class Submit extends Component {
         });
     } 
 
-    _onSubmit(){
+    onSubmit(){
         console.log(this.state)
 
-     //   http.post('/item',{
-     //       'item': this.state.item
-     //   });
-        
         if (this.state.uuid === ''){
             this.state.uuid = uuidGen.v1();
         }
@@ -84,12 +80,12 @@ export default class Submit extends Component {
                 </Text>
                 <Button
                     style={styles.button}
-                    onPress={()=>this._onTakePhoto()}
+                    onPress={()=>this.onTakePhoto()}
                     title='Take a selfie'
                 />
                 <Button
                     style={styles.button}
-                    onPress={()=>this._onSubmit()}
+                    onPress={()=>this.onSubmit()}
                     title="submit"
                 />
             </View>
