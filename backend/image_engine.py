@@ -13,12 +13,6 @@ class ImageEngine:
     def request(self, item):
         raise NotImplementedError
     
- #   def iterate(self, idx):
- #       return self.images[idx]
- #   
- #   def length(self):
- #       return len(self.images)
-    
 class BingImageEngine(ImageEngine):
     def __init__(self, key):
         super(BingImageEngine, self).__init__()
@@ -31,7 +25,7 @@ class BingImageEngine(ImageEngine):
         if image_results.value:
             print("Total number of images returned: {}".format(len(image_results.value)))
             self.msg = "Successfully requested!"
-            for i in range(int(len(image_results.value)/10)):
+            for i in range(int(len(image_results.value)/3)):
                 image_result = image_results.value[i]
                 print("image thumbnail url: {}".format(image_result.thumbnail_url))
                 print("image content url: {}".format(image_result.content_url))
