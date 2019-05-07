@@ -36,12 +36,16 @@ class BingImageEngine(ImageEngine):
                 img = Image.open(urlopen(image_result.thumbnail_url))
                 #images.append(cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR))
                 list[idx] = cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR)
+                #print(idx)
 
+            threads = list()
             for i in range(len(image_results.value)):
                 x = threading.Thread(target=get_image, args=(i, images, image_results.value))
+                threads.append(x)
                 x.start()
-                x.join()
-
+            
+            for t in threads:
+                t.join()
 
 
           #  for i in range(int(len(image_results.value)/3)):
