@@ -74,19 +74,36 @@ export default class Swap extends Component {
         });
     }
 
+    saveImage(){
+      // TODO
+    }
+
     render(){
         return (
         <View>
-            <Text style={styles.swap}>Show swapped results here</Text>
-            <Image
-              style={{width: this.state.width, height: this.state.height}}
-              source={{uri: this.state.cur_url}}
-            />
-            <Button
-                style={styles.button}
-                onPress={()=>this.receiveImage()}
-                title='Next Image'
-            />
+          <View style={styles.container}>
+              <Image
+                style={{width: this.state.width, height: this.state.height}}
+                source={{uri: this.state.cur_url}}
+              />
+              <Button
+                  style={styles.button}
+                  onPress={()=>this.receiveImage()}
+                  title='Next Image'
+              />
+          </View>
+          <View style={styles.buttonContainer}>
+              <Button
+                  style={styles.saveButton}
+                  onPress={()=>this.receiveImage()}
+                  title='save'
+              />
+              <Button
+                  style={styles.NextButton}
+                  onPress={()=>this.receiveImage()}
+                  title='next'
+              />
+          </View>
         </View>
         )
     }
@@ -100,6 +117,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   button: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  buttonContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    bottom: 0 
+  },
+  saveButton: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  NextButton: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,

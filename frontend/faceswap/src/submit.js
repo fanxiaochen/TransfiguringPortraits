@@ -5,10 +5,15 @@ import {
     Button,
     TextInput,
     Text,
+    Alert,
+    Dimensions,
     StyleSheet
 } from 'react-native'
 import ImagePicker from 'react-native-image-picker';
 import {submitFormData, uuidGen} from './upload'
+
+let screenWidth = Dimensions.get('window').width;
+let screenHeight = Dimensions.get('window').height;
 
 const options = {
   title: 'Select Avatar',
@@ -55,6 +60,31 @@ export default class Submit extends Component {
     onSubmit(){
         console.log(this.state)
 
+        if (this.state.item === ''){
+            Alert.alert(
+              'Error',
+              'please type a style',
+              [
+                {text: 'OK', onPress: () => console.log('OK Pressed')},
+              ],
+              {cancelable: false},
+            );
+            return;
+        }
+
+        if (Object.entries(this.state.avatarSource).length === 0){
+            Alert.alert(
+              'Error',
+              'please take a selfie',
+              [
+                {text: 'OK', onPress: () => console.log('OK Pressed')},
+              ],
+              {cancelable: false},
+            );
+            return;
+        }
+
+
         if (this.state.uuid === ''){
             this.state.uuid = uuidGen.v1();
         }
@@ -72,22 +102,22 @@ export default class Submit extends Component {
             <View style={styles.container}>
                 <TextInput
                     style={styles.input}
+                    autoFocus={true}
                     placeholder="Type a style for swapping, like obama"
                     onChangeText={(item) => this.setState({item})}
                 />
-                <Text style={{padding: 10, fontSize: 38}}>
-                    {this.state.item.split(' ').map((word) => word && '🍕').join(' ')}
-                </Text>
                 <Button
-                    style={styles.button}
+                    style={styles.photoButton}
                     onPress={()=>this.onTakePhoto()}
-                    title='Take a selfie'
+                    title='Take selfie'
                 />
-                <Button
-                    style={styles.button}
-                    onPress={()=>this.onSubmit()}
-                    title="submit"
-                />
+                <View style={styles.submitContainer}>
+                    <Button
+                        onPress={()=>this.onSubmit()}
+                        color="#ff5c5c"
+                        title="submit"
+                    />
+                </View>
             </View>
         )
     }
@@ -99,15 +129,24 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#F5FCFF',
-  },
-  button: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
+    position: 'absolute',
+    top: 0,
+    height: screenHeight / 2
   },
   input: {
     fontSize: 20,
     textAlign: 'center',
     margin: 10,
+  },
+  photoButton: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  submitContainer: {
+    justifyContent: 'center', 
+    alignItems: 'center',
+    position: 'absolute',
+    bottom: 0 
   },
 });

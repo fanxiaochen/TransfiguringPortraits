@@ -12,7 +12,7 @@ export default class Welcome extends Component {
     render(){
         return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>A simple demo of face swapping</Text>
+        <Text style={styles.welcome}>Face Swapping Demo</Text>
         <Button
             onPress={()=>this.props.navigation.navigate('Submit')}
             title="Let's start"
@@ -30,8 +30,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F5FCFF',
   },
   welcome: {
-    fontSize: 20,
+    fontSize: 30,
+    fontWeight: "bold",
     textAlign: 'center',
-    margin: 10,
+    margin: 30,
   },
 });

@@ -2,6 +2,7 @@ import React, {Component} from 'react'
 import {
     View,
     Text,
+    Alert,
     StyleSheet
 } from 'react-native'
 
@@ -44,13 +45,23 @@ export default class Waiting extends Component {
     mounted() {
       if(this.state.status != 'Accepted') {
         this.pollInterval = setInterval(()=>{this.hasSwapped()}, 2000) //save reference to the interval
-        setTimeout(() => {clearInterval(this.pollInterval)}, 600000) //stop polling after an hour
+        setTimeout(() => {
+          clearInterval(this.pollInterval);
+          Alert.alert(
+            'Timeout',
+            'could not connect to server',
+            [
+              {text: 'OK', onPress: () => console.log('OK Pressed')},
+            ],
+            {cancelable: false},
+          );
+        }, 60000) //stop polling after an hour
       }
     }
 
     render(){
         return (
-        <View>
+        <View style={styles.container}>
             <Text style={styles.wait}>Please waiting for a while...</Text>
         </View>
         )
