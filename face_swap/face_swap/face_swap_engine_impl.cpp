@@ -370,16 +370,29 @@ namespace face_swap
 	bool FaceSwapEngineImpl::estimate(FaceData& face_data)
 	{
 		// preprocess
+		auto before = sclock::now();
 		preprocessImages(face_data);
+		auto duration = std::chrono::duration_cast<ms>(sclock::now() - before);
+		std::cout << "During face data estimation, prepocessImages took " << duration.count() << "ms" << std::endl;
+
 
 		// face segmentation
+		before = sclock::now();
 		segment(face_data);
+		duration = std::chrono::duration_cast<ms>(sclock::now() - before);
+		std::cout << "During face data estimation, segment took " << duration.count() << "ms" << std::endl;
 
 		// 2d landmarks
+		before = sclock::now();
 		landmarks(face_data);
+		duration = std::chrono::duration_cast<ms>(sclock::now() - before);
+		std::cout << "During face data estimation, landmarks took " << duration.count() << "ms" << std::endl;
 
 		// 3d shape coefficients and pose
+		//before = sclock::now();
 		//shape(face_data);
+		//duration = std::chrono::duration_cast<ms>(sclock::now() - before);
+		//std::cout << "During face data estimation, shape took " << duration.count() << "ms" << std::endl;
 
 
 		return true;
