@@ -4,7 +4,8 @@ import axios from 'axios';
 
 
 //export const serverUrl = 'http://127.0.0.1:5000';
-export const serverUrl = 'http://192.168.31.126:5000';
+//export const serverUrl = 'http://192.168.31.126:5000';
+export const serverUrl = 'http://xiaochenfan.xyz:9080';
 export const http = axios.create({
   baseURL: serverUrl
 });
