@@ -11,10 +11,6 @@ from swapper import *
 
 app = Flask(__name__)
 
-swapper = Swapper()
-swapper.start_img_engine()
-swapper.start_fs_engine()
-
 user_cache = 'user.json'
 if not os.path.exists(user_cache):
     with open(user_cache,'w') as f:
@@ -82,7 +78,6 @@ def swapped_images():
 
 @app.route("/", methods=["POST"])
 def swap():
-#    print(request.json)
     img = request.files["image"].read()
     item = request.form['item']
     uuid = request.form['uuid']
@@ -90,38 +85,15 @@ def swap():
     print(item)
 
     def swapping(uuid, img, item):
-#        for i in range(5):
-#            time.sleep(10)
-#            
-#            uuid_cache = os.path.join(image_cache, uuid) 
-#            if not os.path.exists(uuid_cache):
-#                os.mkdir(uuid_cache)
-#                uuid_data = dict()
-#                uuid_data[item]= [] 
-##                uuid_data['img_idx']= 0 
-#                uuid_list[uuid] = uuid_data
-#
-#            img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
-#            img_file = os.path.join(uuid_cache, img_name)
-#            print(img_file)
-#            npimg = np.fromstring(img, np.int8)
-#            cvimg = cv2.imdecode(npimg, 1)
-#            cv2.imwrite(img_file, cvimg)
-#            uuid_list[uuid][item].append(img_name)
-##            swapped_list.append('%d.jpg' % i)
-##            swapped_list.append(img_file)
-#
-#            # I need better way to save
-#            with open(user_cache, "w") as f:
-#                json.dump(uuid_list, f)
-#        return
+        swapper = Swapper()
+        swapper.start_img_engine()
+        swapper.start_fs_engine()
 
         uuid_cache = os.path.join(image_cache, uuid) 
         if not os.path.exists(uuid_cache):
             os.mkdir(uuid_cache)
             uuid_data = dict()
             uuid_data[item]= [] 
-#                uuid_data['img_idx']= 0 
             uuid_list[uuid] = uuid_data
             # I need better way to save
             with open(user_cache, "w") as f:
@@ -129,11 +101,13 @@ def swap():
 
         npimg = np.fromstring(img, np.int8)
         cvimg = cv2.imdecode(npimg, 1)
+        # scale in client is better
         img_h, img_w, _ = cvimg.shape
         scale = int(img_w / 1000) + 4
         resized = (int(img_w / scale), int(img_h /scale))
         print(resized)
         scaled_img = cv2.resize(cvimg, resized)
+
         time_start = time.time()
         src_img = swapper.set_image(scaled_img)
         time_end = time.time()
@@ -163,9 +137,8 @@ def swap():
                 with open(user_cache, "w") as f:
                     json.dump(uuid_list, f)
         return
-    
-    thread = threading.Thread(target=swapping, kwargs={'uuid': uuid, 'img': img, 'item': item})
-    thread.start()
+
+    swapping(uuid, img, item)    
 
     return jsonify({
         "status": "OK",
@@ -173,5 +146,5 @@ def swap():
 
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')
-     app.run(host='192.168.31.126')
-     #app.run(host='127.0.0.1',port=4949, debug=True)
+     #app.run(host='192.168.31.126')
+     app.run(host='127.0.0.1',port=9080, threaded=True)

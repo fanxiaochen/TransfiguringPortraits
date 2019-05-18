@@ -11,7 +11,7 @@ seg_model_path = 'data/face_seg_fcn8s_300.caffemodel'          # or 'data/face_s
 seg_deploy_path = 'data/face_seg_fcn8s_300_deploy.prototxt'    # or 'data/face_seg_fcn8s_300_deploy.prototxt' for lower resolution
 generic = False
 with_expr = False
-with_gpu = False
+with_gpu = True
 gpu_device_id = 0
 
 
@@ -83,8 +83,9 @@ if __name__ == "__main__":
                     seg_model_path, seg_deploy_path,
                     generic, with_expr, with_gpu, gpu_device_id)
     
-    img1 = fspy.FaceData('trump1.jpg')
-    img2 = fspy.FaceData('xi1.jpg')
+    import cv2
+    img1 = fspy.FaceData(cv2.imread('trump1.jpg'))
+    img2 = fspy.FaceData(cv2.imread('xi1.jpg'))
     fs_engine.estimate(img1)
     fs_engine.estimate(img2)
 
