@@ -134,12 +134,26 @@ def swap():
         resized = (int(img_w / scale), int(img_h /scale))
         print(resized)
         scaled_img = cv2.resize(cvimg, resized)
+        time_start = time.time()
         src_img = swapper.set_image(scaled_img)
+        time_end = time.time()
+        print('set source image time:', time_end-time_start)
+
+        time_start = time.time()
         tgt_imgs = swapper.request_images(item)
+        time_end = time.time()
+        print('request images time:', time_end-time_start)
 
         for idx in range(len(tgt_imgs)):
+            time_start = time.time()
             tgt_img = swapper.set_image(tgt_imgs[idx])
+            time_end = time.time()
+            print('set target image time:', time_end-time_start)
+
+            time_start = time.time()
             swapped_img = swapper.process_one(src_img, tgt_img)
+            time_end = time.time()
+            print('process_one time:', time_end-time_start)
             if swapped_img.size != 0:
                 img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
                 img_file = os.path.join(uuid_cache, img_name)
