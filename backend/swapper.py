@@ -75,3 +75,17 @@ class Swapper:
 
 
 
+if __name__ == "__main__":
+
+    fs_engine = fspy.FaceSwap(landmarks_path, model_3dmm_h5_path,
+                    model_3dmm_dat_path, reg_model_path,
+                    reg_deploy_path, reg_mean_path,
+                    seg_model_path, seg_deploy_path,
+                    generic, with_expr, with_gpu, gpu_device_id)
+    
+    img1 = fspy.FaceData('trump1.jpg')
+    img2 = fspy.FaceData('xi1.jpg')
+    fs_engine.estimate(img1)
+    fs_engine.estimate(img2)
+
+

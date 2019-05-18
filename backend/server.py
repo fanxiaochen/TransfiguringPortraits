@@ -86,8 +86,8 @@ def swap():
     img = request.files["image"].read()
     item = request.form['item']
     uuid = request.form['uuid']
-#    print(img)
-#    print(item)
+    print(uuid)
+    print(item)
 
     def swapping(uuid, img, item):
 #        for i in range(5):

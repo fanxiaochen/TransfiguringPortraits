@@ -20,6 +20,8 @@ namespace face_swap
 		}
 		else Caffe::set_mode(Caffe::CPU);
 
+		std::cout << "Caffe gpu in segment:" << m_with_gpu << std::endl;
+
 		// Load the network
 		m_net.reset(new Net<float>(deploy_file, caffe::TEST));
 		m_net->CopyTrainedLayersFrom(model_file);
