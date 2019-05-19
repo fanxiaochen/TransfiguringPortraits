@@ -90,7 +90,7 @@ def swap():
         swapper.start_fs_engine()
 
         uuid_cache = os.path.join(image_cache, uuid) 
-        if not os.path.exists(uuid_cache):
+        if not uuid in uuid_list:
             os.mkdir(uuid_cache)
             uuid_list[uuid] = dict()
             # I need better way to save
@@ -98,7 +98,7 @@ def swap():
                 json.dump(uuid_list, f)
         
         if not item in uuid_list[uuid]:
-            uuid_list[uuid][item] = dict()
+            uuid_list[uuid][item] = list()
             # I need better way to save
             with open(user_cache, "w") as f:
                 json.dump(uuid_list, f)
