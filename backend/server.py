@@ -127,7 +127,7 @@ def swap():
 
         for idx in range(len(tgt_imgs)):
             time_start = time.time()
-            if tgt_imgs[idx]:
+            if tgt_imgs[idx] is None:
                 continue
             tgt_img, suc = swapper.set_image(tgt_imgs[idx])
             if not suc:
@@ -157,6 +157,14 @@ def swap():
         return jsonify({
             "status": "OK",
         })
+
+
+def run():
+  channel = grpc.insecure_channel('localhost:50051')
+  stub = helloworld_pb2_grpc.GreeterStub(channel)
+  response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
+  print("Greeter client received: " + response.message)        
+  
 
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')
