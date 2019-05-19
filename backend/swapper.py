@@ -35,8 +35,8 @@ class Swapper:
     
     def set_image(self, img):
         img = fspy.FaceData(img)
-        self.fs_engine.estimate(img)
-        return img
+        success = self.fs_engine.estimate(img)
+        return img, success 
 
     def request_images(self, item):
         return self.img_engine.request(item)

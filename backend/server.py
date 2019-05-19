@@ -113,7 +113,10 @@ def swap():
         scaled_img = cv2.resize(cvimg, resized)
 
         time_start = time.time()
-        src_img = swapper.set_image(scaled_img)
+        src_img, suc = swapper.set_image(scaled_img)
+        # no face in source image
+        if not suc:
+            return False
         time_end = time.time()
         print('set source image time:', time_end-time_start)
 
@@ -124,7 +127,9 @@ def swap():
 
         for idx in range(len(tgt_imgs)):
             time_start = time.time()
-            tgt_img = swapper.set_image(tgt_imgs[idx])
+            tgt_img, suc = swapper.set_image(tgt_imgs[idx])
+            if not suc:
+                continue
             time_end = time.time()
             print('set target image time:', time_end-time_start)
 
@@ -140,13 +145,16 @@ def swap():
                 # I need better way to save
                 with open(user_cache, "w") as f:
                     json.dump(uuid_list, f)
-        return
+        return True
 
-    swapping(uuid, img, item)    
-
-    return jsonify({
-        "status": "OK",
-    })
+    if not swapping(uuid, img, item):    
+        return jsonify({
+            "status": "Invalid",
+        })
+    else:
+        return jsonify({
+            "status": "OK",
+        })
 
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')

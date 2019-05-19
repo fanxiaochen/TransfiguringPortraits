@@ -359,6 +359,8 @@ namespace face_swap
 		}
 
 		// Crop images
+		std::cout << "scaled_box  " << "w:" << face_data.scaled_bbox.width << " h:" << face_data.scaled_bbox.height << std::endl; 
+		std::cout << "scaled_img  " << "w:" << face_data.scaled_img.cols << " h:" << face_data.scaled_img.rows << std::endl; 
 		face_data.cropped_img = face_data.scaled_img(face_data.scaled_bbox);
 		if (!face_data.scaled_seg.empty()) 
 			face_data.cropped_seg = face_data.scaled_seg(face_data.scaled_bbox);
@@ -371,7 +373,7 @@ namespace face_swap
 	{
 		// preprocess
 		auto before = sclock::now();
-		preprocessImages(face_data);
+		if (!preprocessImages(face_data)) return false;
 		auto duration = std::chrono::duration_cast<ms>(sclock::now() - before);
 		std::cout << "During face data estimation, prepocessImages took " << duration.count() << "ms" << std::endl;
 
@@ -586,6 +588,7 @@ namespace face_swap
 	bool FaceSwapEngineImpl::segment(FaceData& face_data)
 	{
 		face_data.cropped_seg = m_face_seg->process(face_data.cropped_img);
+		cv::imwrite("cropped_img.png", face_data.cropped_img);
 		face_data.scaled_seg = cv::Mat::zeros(face_data.scaled_img.size(), CV_8U);
 		face_data.cropped_seg.copyTo(face_data.scaled_seg(face_data.scaled_bbox));
 		return true;
