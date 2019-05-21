@@ -158,6 +158,14 @@ def swap():
             "status": "OK",
         })
 
+
+def run():
+  channel = grpc.insecure_channel('localhost:50051')
+  stub = helloworld_pb2_grpc.GreeterStub(channel)
+  response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
+  print("Greeter client received: " + response.message)        
+  
+
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')
      #app.run(host='192.168.31.126')
