@@ -22,6 +22,9 @@ class Swapper:
         self.fs_engine = None
         self.img_engine = None
 
+    def set_mode_gpu(self):
+        self.fs_engine.set_mode_gpu()
+
     def start_fs_engine(self):
         self.fs_engine = fspy.FaceSwap(landmarks_path, model_3dmm_h5_path,
                         model_3dmm_dat_path, reg_model_path,
