@@ -127,7 +127,7 @@ def swap():
 
         for idx in range(len(tgt_imgs)):
             time_start = time.time()
-            if tgt_imgs[idx]:
+            if tgt_imgs[idx] is None:
                 continue
             tgt_img, suc = swapper.set_image(tgt_imgs[idx])
             if not suc:
