@@ -11,7 +11,8 @@ namespace face_swap
 
 	FaceSeg::FaceSeg(const string& deploy_file, const string& model_file,
 		bool with_gpu, int gpu_device_id, bool scale, bool postprocess_seg) :
-		m_num_channels(0), m_with_gpu(with_gpu), m_scale(scale), m_postprocess_seg(postprocess_seg)
+		m_num_channels(0), m_with_gpu(with_gpu), m_scale(scale), m_postprocess_seg(postprocess_seg),
+		m_gpu_device_id(gpu_device_id)
 	{
 		if (with_gpu)
 		{
@@ -44,6 +45,12 @@ namespace face_swap
 
 	FaceSeg::~FaceSeg()
 	{
+	}
+
+	void FaceSeg::set_mode_gpu()
+	{
+		Caffe::SetDevice(m_gpu_device_id);
+		Caffe::set_mode(Caffe::GPU);
 	}
 
 	cv::Mat FaceSeg::process(const cv::Mat& img)

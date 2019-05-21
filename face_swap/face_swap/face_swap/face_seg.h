@@ -41,6 +41,8 @@ namespace face_swap
 		*/
         cv::Mat process(const cv::Mat& img);
 
+		void set_mode_gpu();
+
     private:
 
 		/** Wrap the input layer of the network in separate cv::Mat objects
@@ -70,6 +72,8 @@ namespace face_swap
 		bool m_scale;
 		bool m_postprocess_seg;
 		int m_foreground_channel = 1;
+
+		int m_gpu_device_id;
 
 		// Mean pixel color
 		const float MB = 104.00699f, MG = 116.66877f, MR = 122.67892f;

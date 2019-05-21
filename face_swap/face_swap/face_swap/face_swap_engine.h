@@ -137,6 +137,8 @@ namespace face_swap
 		@return The aligned matrix.
 		*/
 		virtual cv::Mat fine_tune(cv::Mat& src_data, cv::Mat& tgt_data) = 0;
+
+		virtual void set_mode_gpu() = 0;
 	};
 
 }   // namespace face_swap

@@ -28,6 +28,10 @@ image_cache = os.path.join(static_cache, 'image')
 if not os.path.exists(image_cache):
     os.mkdir(image_cache)
 
+swapper = Swapper()
+swapper.start_img_engine()
+swapper.start_fs_engine()
+
 @app.route("/swapped", methods=["GET"])
 def has_swapped():
     # send image back
@@ -85,9 +89,8 @@ def swap():
     print(item)
 
     def swapping(uuid, img, item):
-        swapper = Swapper()
-        swapper.start_img_engine()
-        swapper.start_fs_engine()
+        # need set gpu mode in each thread
+        swapper.set_mode_gpu()
 
         uuid_cache = os.path.join(image_cache, uuid) 
         if not uuid in uuid_list:
@@ -159,12 +162,6 @@ def swap():
         })
 
 
-def run():
-  channel = grpc.insecure_channel('localhost:50051')
-  stub = helloworld_pb2_grpc.GreeterStub(channel)
-  response = stub.SayHello(helloworld_pb2.HelloRequest(name='you'))
-  print("Greeter client received: " + response.message)        
-  
 
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')

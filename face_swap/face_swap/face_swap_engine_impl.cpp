@@ -617,6 +617,11 @@ namespace face_swap
 		return true;
 	}
 
+	void FaceSwapEngineImpl::set_mode_gpu()
+	{
+		m_face_seg->set_mode_gpu();
+	}
+
 	// https://stackoverflow.com/questions/21206870/opencv-rigid-transformation-between-two-3d-point-clouds
 	// https://docs.opencv.org/3.1.0/d4/d61/tutorial_warp_affine.html
 	bool FaceSwapEngineImpl::computeRigid(const std::vector<cv::Point> &srcPoints, const std::vector<cv::Point> &dstPoints, cv::Mat &transf, bool xyExchange)

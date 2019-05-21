@@ -96,6 +96,8 @@ namespace face_swap
 		*/
 		cv::Mat fine_tune(cv::Mat& src_data, cv::Mat& tgt_data);
 
+		void set_mode_gpu();
+
 	private:
 
 		/** Crops the image and it's corresponding segmentation according

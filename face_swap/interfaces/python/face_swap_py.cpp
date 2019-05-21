@@ -267,6 +267,11 @@ public:
 		return out;
 	}
 
+	void set_mode_gpu()
+	{
+		m_fs->set_mode_gpu();
+	}
+
 private:
 	std::shared_ptr<face_swap::FaceSwapEngine> m_fs;
 };
@@ -327,6 +332,7 @@ BOOST_PYTHON_MODULE(face_swap_py)
 		.def("compare", &FaceSwap::compare)
 		.def("estimate", &FaceSwap::estimate)
 		.def("transfer", &FaceSwap::transfer)
+		.def("set_mode_gpu", &FaceSwap::set_mode_gpu)
 		;
 
 	p::def("read_face_data", read_face_data);
