@@ -92,6 +92,7 @@ export default class Submit extends Component {
         global.uuid = this.state.uuid;
 
         submitFormData(this.state.avatarSource.uri, this.state.item, this.state.uuid);
+        console.log(global.curItem)
 
         this.props.navigation.navigate('Wait');
     }

@@ -11,7 +11,7 @@ seg_model_path = 'data/face_seg_fcn8s_300.caffemodel'          # or 'data/face_s
 seg_deploy_path = 'data/face_seg_fcn8s_300_deploy.prototxt'    # or 'data/face_seg_fcn8s_300_deploy.prototxt' for lower resolution
 generic = False
 with_expr = False
-with_gpu = True
+with_gpu = False
 gpu_device_id = 0
 
 

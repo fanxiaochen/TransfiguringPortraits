@@ -36,6 +36,7 @@ export default class Waiting extends Component {
           //check if status is completed, if it is stop polling 
           if(response.data.status === 'Accepted') {
               clearInterval(this.pollInterval) //won't be polled anymore 
+              clearTimeout(this.timeout)
               this.props.navigation.navigate('Swap')
           }
         });
@@ -45,7 +46,7 @@ export default class Waiting extends Component {
     mounted() {
       if(this.state.status != 'Accepted') {
         this.pollInterval = setInterval(()=>{this.hasSwapped()}, 2000) //save reference to the interval
-        setTimeout(() => {
+        this.timeout = setTimeout(() => {
           clearInterval(this.pollInterval);
           Alert.alert(
             'Timeout',

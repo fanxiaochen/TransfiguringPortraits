@@ -90,7 +90,7 @@ def swap():
 
     def swapping(uuid, img, item):
         # need set gpu mode in each thread
-        swapper.set_mode_gpu()
+        #swapper.set_mode_gpu()
 
         uuid_cache = os.path.join(image_cache, uuid) 
         if not uuid in uuid_list:
@@ -128,7 +128,7 @@ def swap():
         time_end = time.time()
         print('request images time:', time_end-time_start)
 
-        for idx in range(len(tgt_imgs)):
+        for idx in range(int(len(tgt_imgs)/10)):
             time_start = time.time()
             if tgt_imgs[idx] is None:
                 continue
@@ -152,7 +152,9 @@ def swap():
                     json.dump(uuid_list, f)
         return True
 
+    print("Start swapping")
     if not swapping(uuid, img, item):    
+    #if True:    
         return jsonify({
             "status": "Invalid",
         })
@@ -165,5 +167,5 @@ def swap():
 
 if __name__ == "__main__":
      #app.run(debug=True, host= '0.0.0.0')
-     #app.run(host='192.168.31.126')
-     app.run(host='127.0.0.1',port=9080, threaded=True)
+     app.run(host='192.168.31.126')
+     #app.run(host='127.0.0.1',port=9080, threaded=True)
