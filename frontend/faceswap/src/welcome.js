@@ -8,7 +8,6 @@ import {
 
 
 export default class Welcome extends Component {
-
     render(){
         return (
       <View style={styles.container}>
@@ -20,7 +19,7 @@ export default class Welcome extends Component {
       </View>
         );
     }
-}
+  }
 
 const styles = StyleSheet.create({
   container: {
