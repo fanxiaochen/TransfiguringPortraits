@@ -10,7 +10,9 @@
     "buffer": "^5.2.1",
     "react": "16.8.3",
     "react-native": "0.59.3",
-    "react-native-gesture-handler": "^1.2.0"
+    "react-native-gesture-handler": "^1.2.0",
+    "react-native-image-picker": "^0.28.1",
+    "react-native-uuid": "^1.4.9"
   },
   "devDependencies": {
     "@babel/core": "7.4.3",

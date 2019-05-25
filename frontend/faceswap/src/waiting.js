@@ -56,7 +56,7 @@ export default class Waiting extends Component {
             ],
             {cancelable: false},
           );
-        }, 60000) //stop polling after an hour
+        }, 60000) //stop polling after an min
       }
     }
 

@@ -4,7 +4,6 @@ import {
     View,
     Button,
     TextInput,
-    Text,
     Alert,
     Dimensions,
     StyleSheet
@@ -50,9 +49,6 @@ export default class Submit extends Component {
                 });
                 console.log(this.state);
 
-               // formImageBody(response.uri);
-
-               // this.props.navigation.navigate('Item');
             }
         });
     } 
