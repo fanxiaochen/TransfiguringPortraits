@@ -359,8 +359,8 @@ namespace face_swap
 		}
 
 		// Crop images
-		std::cout << "scaled_box  " << "w:" << face_data.scaled_bbox.width << " h:" << face_data.scaled_bbox.height << std::endl; 
-		std::cout << "scaled_img  " << "w:" << face_data.scaled_img.cols << " h:" << face_data.scaled_img.rows << std::endl; 
+	//	std::cout << "scaled_box  " << "w:" << face_data.scaled_bbox.width << " h:" << face_data.scaled_bbox.height << std::endl; 
+	//	std::cout << "scaled_img  " << "w:" << face_data.scaled_img.cols << " h:" << face_data.scaled_img.rows << std::endl; 
 		face_data.cropped_img = face_data.scaled_img(face_data.scaled_bbox);
 		if (!face_data.scaled_seg.empty()) 
 			face_data.cropped_seg = face_data.scaled_seg(face_data.scaled_bbox);
@@ -482,12 +482,12 @@ namespace face_swap
 		std::cout << t << std::endl;
 		cv::Mat warpped;
 		cv::warpAffine(src_data.cropped_img, warpped, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-		writeImage("warpped.jpg", warpped);
+	//	writeImage("warpped.jpg", warpped);
 
-		writeImage("src_seg.png",src_data.cropped_seg);
-		writeImage("src_face.png",src_data.cropped_img);
-		writeImage("tgt_seg.png",tgt_data.cropped_seg);
-		writeImage("tgt_face.png",tgt_data.cropped_img);
+	//	writeImage("src_seg.png",src_data.cropped_seg);
+	//	writeImage("src_face.png",src_data.cropped_img);
+	//	writeImage("tgt_seg.png",tgt_data.cropped_seg);
+	//	writeImage("tgt_face.png",tgt_data.cropped_img);
 
 		return t;
 	}
@@ -529,8 +529,8 @@ namespace face_swap
 		cv::Mat warpped_src_img, warpped_src_seg;
 		cv::warpAffine(src_data.cropped_img, warpped_src_img, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
 		cv::warpAffine(src_data.cropped_seg, warpped_src_seg, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-		writeImage("warpped_src_img.jpg", warpped_src_img);
-		writeImage("warpped_src_seg.jpg", warpped_src_seg);
+	//	writeImage("warpped_src_img.jpg", warpped_src_img);
+	//	writeImage("warpped_src_seg.jpg", warpped_src_seg);
 		cv::Mat tuned_mat = fine_tune(warpped_src_seg, tgt_data.cropped_seg);
 
 		// blending
@@ -566,20 +566,20 @@ namespace face_swap
 		cv::Mat warpped_img, warpped_seg;
 		cv::warpAffine(src_data.cropped_img, warpped_img, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
 		cv::warpAffine(src_data.cropped_seg, warpped_seg, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-		writeImage("warpped_img.jpg", warpped_img);
-		writeImage("warpped_seg.jpg", warpped_seg);
-		writeImage("tgt_scaled_img.jpg", tgt_data.scaled_img);
+	//	writeImage("warpped_img.jpg", warpped_img);
+	//	writeImage("warpped_seg.jpg", warpped_seg);
+	//	writeImage("tgt_scaled_img.jpg", tgt_data.scaled_img);
 
 		cv::Mat blended;
 		//cv::Point p = mask_center(tgt_data.cropped_seg);
-		std::cout << "scale:" << tgt_data.scale << std::endl;
+	//	std::cout << "scale:" << tgt_data.scale << std::endl;
 		cv::Point cropped_in_origin = cv::Point(tgt_data.scaled_bbox.x + tgt_data.scaled_bbox.width/2, tgt_data.scaled_bbox.y + tgt_data.scaled_bbox.height/2);
 		cv::Point cropped_mask_center = mask_center(tgt_data.cropped_seg) * 1.0/tgt_data.scale;
 		cv::Point cropped_center = cv::Point(tgt_data.cropped_seg.cols/2, tgt_data.cropped_seg.rows/2) * 1.0/tgt_data.scale;
 		cv::Point p = cropped_mask_center - cropped_center + cropped_in_origin;
-		std::cout << "center:" << p << std::endl;
-		std::cout << "src warpped_img  " << "w:" << warpped_img.cols << " h:" << warpped_img.rows << std::endl; 
-		std::cout << "tgt scaled_img  " << "w:" << tgt_data.scaled_img.cols << " h:" << tgt_data.scaled_img.rows << std::endl; 
+	//	std::cout << "center:" << p << std::endl;
+	//	std::cout << "src warpped_img  " << "w:" << warpped_img.cols << " h:" << warpped_img.rows << std::endl; 
+	//	std::cout << "tgt scaled_img  " << "w:" << tgt_data.scaled_img.cols << " h:" << tgt_data.scaled_img.rows << std::endl; 
 		//cv::seamlessClone(warpped_img, tgt_data.cropped_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
 		int src_w = warpped_img.cols, src_h = warpped_img.rows;
 		int tgt_w = tgt_data.scaled_img.cols, tgt_h = tgt_data.scaled_img.rows;
@@ -587,7 +587,7 @@ namespace face_swap
 		if (p.x - src_w/2 < 0 || p.x + src_w/2 > tgt_w || p.y - src_h/2 < 0 || p.y + src_h/2 > tgt_h)
 			return cv::Mat();
 		cv::seamlessClone(warpped_img, tgt_data.scaled_img, warpped_seg, p, blended, cv::NORMAL_CLONE);
-		writeImage("cloned.jpg", blended);
+	//	writeImage("cloned.jpg", blended);
 
 		return blended;
 	}
@@ -596,7 +596,7 @@ namespace face_swap
 	bool FaceSwapEngineImpl::segment(FaceData& face_data)
 	{
 		face_data.cropped_seg = m_face_seg->process(face_data.cropped_img);
-		cv::imwrite("cropped_img.png", face_data.cropped_img);
+		//cv::imwrite("cropped_img.png", face_data.cropped_img);
 		face_data.scaled_seg = cv::Mat::zeros(face_data.scaled_img.size(), CV_8U);
 		face_data.cropped_seg.copyTo(face_data.scaled_seg(face_data.scaled_bbox));
 		return true;
@@ -823,8 +823,8 @@ namespace face_swap
 	
 		transf = total;
 
-		std::cout << "icp transform" << std::endl;
-		std::cout << transf << std::endl;
+	//	std::cout << "icp transform" << std::endl;
+	//	std::cout << transf << std::endl;
 
 		return true;
 	}
