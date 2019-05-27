@@ -7,7 +7,9 @@
     "test": "jest"
   },
   "dependencies": {
+    "axios": "^0.18.0",
     "buffer": "^5.2.1",
+    "image-downloader": "^3.4.2",
     "react": "16.8.3",
     "react-native": "0.59.3",
     "react-native-gesture-handler": "^1.2.0",

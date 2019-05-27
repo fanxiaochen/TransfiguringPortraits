@@ -32,8 +32,29 @@ export default class Submit extends Component {
         }
     }
     
+//    onTakePhoto() {
+//        ImagePicker.launchCamera(options, (response) => {
+//            if (response.didCancel) {
+//                console.log('User cancelled image picker');
+//            } else if (response.error) {
+//                console.log('ImagePicker Error: ', response.error);
+//            } else {
+//                const source = { uri: response.uri };
+//            
+//                // You can also display the image using data:
+//                // const source = { uri: 'data:image/jpeg;base64,' + response.data };
+//            
+//                this.setState({
+//                avatarSource: source,
+//                });
+//                console.log(this.state);
+//
+//            }
+//        });
+//    } 
+
     onTakePhoto() {
-        ImagePicker.launchCamera(options, (response) => {
+        ImagePicker.showImagePicker(null, (response) => {
             if (response.didCancel) {
                 console.log('User cancelled image picker');
             } else if (response.error) {
