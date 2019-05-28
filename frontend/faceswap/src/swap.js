@@ -8,7 +8,7 @@ import {
     StyleSheet
 } from 'react-native'
 
-import {http} from './upload'
+import {http, download} from './upload'
 
 let screenWidth = Dimensions.get('window').width;
 let screenHeight = Dimensions.get('window').height;
@@ -73,7 +73,7 @@ export default class Swap extends Component {
     }
 
     saveImage(){
-      // TODO
+      download(this.state.cur_url);
     }
 
     render() {
