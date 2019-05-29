@@ -11,7 +11,7 @@ seg_model_path = 'data/face_seg_fcn8s_300.caffemodel'          # or 'data/face_s
 seg_deploy_path = 'data/face_seg_fcn8s_300_deploy.prototxt'    # or 'data/face_seg_fcn8s_300_deploy.prototxt' for lower resolution
 generic = False
 with_expr = False
-with_gpu = False
+with_gpu = True
 gpu_device_id = 0
 
 
@@ -48,9 +48,6 @@ class Swapper:
         swapped = src_img
         # invoke faceswapping (self.src_img, tgt_img) 
         swapped = self.fs_engine.transfer(src_img, cur_tgt)
-        print("swapped")
-        print(swapped.shape)
-        print(type(swapped))
         return swapped
 
     def compare(self, src_img, tgt_img):

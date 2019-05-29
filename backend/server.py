@@ -52,29 +52,14 @@ def swapped_images():
     uuid = request.args.get('uuid')
     item = request.args.get('item')
     img_idx = int(request.args.get('idx'))
-    print(img_idx)
     if img_idx < len(uuid_list[uuid][item]):
-        #img_url = os.path.join(request.url_root, )
         img_url = os.path.join(image_cache, uuid, uuid_list[uuid][item][img_idx])
         print(img_url)
-        
-        #uuid_cache = os.path.join('image', uuid)
-        #re_url = url_for('static', filename=os.path.join(uuid_cache, uuid_list[uuid][item][img_idx]))
-        #re_url = url_for('static', filename='0.jpg')
-        print(request.url_root)
         img_url = os.path.join(request.url_root, img_url)
-      #  print(img_url)
-      #  img_url = request.url_root + re_url[1:]
-      #  print(img_url)
-      #  path = '/home/xiaochen/Workspace/TransfiguringPortraits/backend/static/0.jpg'
-      #  resp = Response(open(path, 'rb'), mimetype="image/jpeg")
-      #  return resp
         return jsonify({
         "status": "Success",
         "url": img_url
         })
-
-        #return send_file(swapped_list[img_idx], mimetype='image/jpeg')
     else:
         return jsonify({
         "status": "WI",
@@ -85,12 +70,10 @@ def swap():
     img = request.files["image"].read()
     item = request.form['item']
     uuid = request.form['uuid']
-    print(uuid)
-    print(item)
 
     def swapping(uuid, img, item):
         # need set gpu mode in each thread
-        #swapper.set_mode_gpu()
+        swapper.set_mode_gpu()
 
         uuid_cache = os.path.join(image_cache, uuid) 
         if not uuid in uuid_list:
@@ -128,7 +111,7 @@ def swap():
         time_end = time.time()
         print('request images time:', time_end-time_start)
 
-        for idx in range(int(len(tgt_imgs)/10)):
+        for idx in range(len(tgt_imgs)):
             time_start = time.time()
             if tgt_imgs[idx] is None:
                 continue
@@ -152,9 +135,7 @@ def swap():
                     json.dump(uuid_list, f)
         return True
 
-    print("Start swapping")
     if not swapping(uuid, img, item):    
-    #if True:    
         return jsonify({
             "status": "Invalid",
         })

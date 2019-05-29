@@ -813,7 +813,7 @@ namespace face_swap
 	//		std::cout << t << std::endl;
 			cv::transform(srcP, srcP, t.rowRange(0,2));
 	//		std::cout << "after:" << srcP[0].x << "," << srcP[0].y << std::endl;
-		//	std::cout << "after transform" << std::endl;
+	//		std::cout << "after transform" << std::endl;
 			total = t * total;
 		//	std::cout << "after accu" << std::endl;
 			source = convert2Mat(srcP, false);

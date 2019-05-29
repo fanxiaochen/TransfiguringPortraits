@@ -31,8 +31,8 @@ class BingImageEngine(ImageEngine):
             images = [None]* len(image_results.value)
             def get_image(idx, list, results):
                 image_result = results[idx]
-                print("image thumbnail url: {}".format(image_result.thumbnail_url))
-                print("image content url: {}".format(image_result.content_url))
+             #   print("image thumbnail url: {}".format(image_result.thumbnail_url))
+             #   print("image content url: {}".format(image_result.content_url))
                 img = Image.open(urlopen(image_result.thumbnail_url))
                 #images.append(cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR))
                 list[idx] = cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR)
@@ -47,14 +47,6 @@ class BingImageEngine(ImageEngine):
             
             for t in threads:
                 t.join()
-
-
-          #  for i in range(int(len(image_results.value)/3)):
-          #      image_result = image_results.value[i]
-          #      print("image thumbnail url: {}".format(image_result.thumbnail_url))
-          #      print("image content url: {}".format(image_result.content_url))
-          #      img = Image.open(urlopen(image_result.thumbnail_url))
-          #      images.append(cv2.cvtColor(numpy.array(img), cv2.COLOR_RGB2BGR))
         else:
             self.msg = "No image results returned!"
             print("No image results returned!")
