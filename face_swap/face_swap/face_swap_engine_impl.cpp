@@ -479,9 +479,10 @@ namespace face_swap
 		computeRigid(hull_src, hull_tgt, t, false);
 	//	t.at<double>(0, 1) = - t.at<double>(0, 1);
 	//	t.at<double>(1, 0) = - t.at<double>(1, 0);
-		std::cout << t << std::endl;
+//		std::cout << t << std::endl;
 		cv::Mat warpped;
 		cv::warpAffine(src_data.cropped_img, warpped, t.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
+//		std::cout << "After WarpAffine" << std::endl;
 	//	writeImage("warpped.jpg", warpped);
 
 	//	writeImage("src_seg.png",src_data.cropped_seg);
@@ -500,15 +501,22 @@ namespace face_swap
 			std::vector<std::vector<cv::Point>> contours;
 			std::vector<cv::Point> totalContours;
 			cv::findContours(mask, contours, CV_RETR_CCOMP, CV_CHAIN_APPROX_SIMPLE);		
+//			std::cout << "after findContours" << std::endl;
 			//for (auto contour : contours)
 			//	totalContours.insert(totalContours.end(), contour.begin(), contour.end());
 
 			//return totalContours;
-			return contours[0];
+			if (contours.size() > 0) return contours[0];
+			else return std::vector<cv::Point>(); 
 		};
+
+//		std::cout << "before mask_boundary" << std::endl;
 
 		auto source = mask_boundary(src_data);
 		auto target = mask_boundary(tgt_data);
+//		std::cout << "after mask_boundary" << std::endl;
+
+		if (source.empty() || target.empty()) return cv::Mat_<double>::eye(3, 3);
 
 		//for (int i = 0; i < src_data.cropped_landmarks.size(); ++i)
 		//	std::cout << "2d lm:" << src_data.cropped_landmarks[i].x << "," << src_data.cropped_landmarks[i].y << std::endl;
@@ -529,8 +537,9 @@ namespace face_swap
 		cv::Mat warpped_src_img, warpped_src_seg;
 		cv::warpAffine(src_data.cropped_img, warpped_src_img, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
 		cv::warpAffine(src_data.cropped_seg, warpped_src_seg, aligned_mat.rowRange(0,2), cv::Size(tgt_data.cropped_img.cols, tgt_data.cropped_img.rows));
-	//	writeImage("warpped_src_img.jpg", warpped_src_img);
-	//	writeImage("warpped_src_seg.jpg", warpped_src_seg);
+//		std::cout << "Before fine_tune"<< std::endl;
+//		writeImage("warpped_src_img.jpg", warpped_src_img);
+//		writeImage("warpped_src_seg.jpg", warpped_src_seg);
 		cv::Mat tuned_mat = fine_tune(warpped_src_seg, tgt_data.cropped_seg);
 
 		// blending
@@ -793,12 +802,15 @@ namespace face_swap
 		int loop = 0;	
 		cv::Mat_<double> total = cv::Mat_<double>::eye(3, 3);
 
+//		std::cout << "icp loop" << std::endl;
+
 		cv::flann::Index kdtree(target, cv::flann::KDTreeIndexParams(1));
 		do
 		{
 			// build correspondences
 			auto indices = knn(source, kdtree);
 			auto tuple = convert(source, target, indices);
+//			std::cout << "before computerigid" << std::endl;
 
 			// compute rigid transform
 			cv::Mat_<double> t;
@@ -806,14 +818,14 @@ namespace face_swap
 			auto dstP = std::get<1>(tuple);
 			computeRigid(srcP, dstP, t, false);
 
-	//		std::cout << "after rigid t:" << std::endl;
+//			std::cout << "after rigid t:" << std::endl;
 	//		// transform source 
 
 	//		std::cout << "before:" << srcP[0].x << "," << srcP[0].y << std::endl;
 	//		std::cout << t << std::endl;
 			cv::transform(srcP, srcP, t.rowRange(0,2));
 	//		std::cout << "after:" << srcP[0].x << "," << srcP[0].y << std::endl;
-	//		std::cout << "after transform" << std::endl;
+//			std::cout << "after transform" << std::endl;
 			total = t * total;
 		//	std::cout << "after accu" << std::endl;
 			source = convert2Mat(srcP, false);
@@ -823,7 +835,7 @@ namespace face_swap
 	
 		transf = total;
 
-	//	std::cout << "icp transform" << std::endl;
+//		std::cout << "icp transform" << std::endl;
 	//	std::cout << transf << std::endl;
 
 		return true;
