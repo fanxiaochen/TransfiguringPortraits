@@ -391,10 +391,10 @@ namespace face_swap
 		std::cout << "During face data estimation, landmarks took " << duration.count() << "ms" << std::endl;
 
 		// 3d shape coefficients and pose
-		//before = sclock::now();
-		//shape(face_data);
-		//duration = std::chrono::duration_cast<ms>(sclock::now() - before);
-		//std::cout << "During face data estimation, shape took " << duration.count() << "ms" << std::endl;
+		before = sclock::now();
+		shape(face_data);
+		duration = std::chrono::duration_cast<ms>(sclock::now() - before);
+		std::cout << "During face data estimation, shape took " << duration.count() << "ms" << std::endl;
 
 
 		return true;
@@ -402,57 +402,63 @@ namespace face_swap
 
 	bool FaceSwapEngineImpl::compare(FaceData& src_data, FaceData& tgt_data)
 	{
-		return true;
-		// compare 2d segmentation map and 3d shape and pose
-		auto src_shapes = src_data.shape_coefficients;
-		auto src_expr = src_data.expr_coefficients;
-		auto src_color = src_data.tex_coefficients;
 		auto src_r = src_data.vecR;
-		auto src_t = src_data.vecT;
-		auto src_k = src_data.K;
-		auto tgt_shapes = tgt_data.shape_coefficients;
-		auto tgt_expr = tgt_data.expr_coefficients;
-		auto tgt_color = tgt_data.tex_coefficients;
 		auto tgt_r = tgt_data.vecR;
-		auto tgt_t = tgt_data.vecT;
-		auto tgt_k = tgt_data.K;
-
-		auto distance = [](cv::Mat v1, cv::Mat v2)
-		{
-			return cv::norm(v1-v2) / v1.rows;
-		};
-
-		float w_s = 0.4, w_r = 0.4, w_e = 0.1, w_c = 0.1;
-
-		float d_s = w_s * distance(src_shapes, tgt_shapes);
-		float d_r = w_r * distance(src_r, tgt_r); 
-		float d_e = w_e * distance(src_expr, tgt_expr);
-		float d_c = w_c * distance(src_color, tgt_color);
-		
-		return (d_s < 0.1 && d_r < 0.1 && d_e < 0.1 && d_c < 0.1);
-
-
-		std::cout << "src_shapes:" << std::endl;
-		std::cout << src_shapes << std::endl;
-		std::cout << "src_expr:" << std::endl;
-		std::cout << src_expr << std::endl;
 		std::cout << "src_r:" << std::endl;
 		std::cout << src_r << std::endl;
-		std::cout << "src_t:" << std::endl;
-		std::cout << src_t << std::endl;
-		std::cout << "src_k:" << std::endl;
-		std::cout << src_k << std::endl;
-
-		std::cout << "tgt_shapes:" << std::endl;
-		std::cout << tgt_shapes << std::endl;
-		std::cout << "tgt_expr:" << std::endl;
-		std::cout << tgt_expr << std::endl;
 		std::cout << "tgt_r:" << std::endl;
 		std::cout << tgt_r << std::endl;
-		std::cout << "tgt_t:" << std::endl;
-		std::cout << tgt_t << std::endl;
-		std::cout << "tgt_k:" << std::endl;
-		std::cout << tgt_k << std::endl;
+		return true;
+		// compare 2d segmentation map and 3d shape and pose
+//		auto src_shapes = src_data.shape_coefficients;
+//		auto src_expr = src_data.expr_coefficients;
+//		auto src_color = src_data.tex_coefficients;
+//		auto src_r = src_data.vecR;
+//		auto src_t = src_data.vecT;
+//		auto src_k = src_data.K;
+//		auto tgt_shapes = tgt_data.shape_coefficients;
+//		auto tgt_expr = tgt_data.expr_coefficients;
+//		auto tgt_color = tgt_data.tex_coefficients;
+//		auto tgt_r = tgt_data.vecR;
+//		auto tgt_t = tgt_data.vecT;
+//		auto tgt_k = tgt_data.K;
+//
+//		auto distance = [](cv::Mat v1, cv::Mat v2)
+//		{
+//			return cv::norm(v1-v2) / v1.rows;
+//		};
+//
+//		float w_s = 0.4, w_r = 0.4, w_e = 0.1, w_c = 0.1;
+//
+//		float d_s = w_s * distance(src_shapes, tgt_shapes);
+//		float d_r = w_r * distance(src_r, tgt_r); 
+//		float d_e = w_e * distance(src_expr, tgt_expr);
+//		float d_c = w_c * distance(src_color, tgt_color);
+//		
+//		return (d_s < 0.1 && d_r < 0.1 && d_e < 0.1 && d_c < 0.1);
+//
+//
+//		std::cout << "src_shapes:" << std::endl;
+//		std::cout << src_shapes << std::endl;
+//		std::cout << "src_expr:" << std::endl;
+//		std::cout << src_expr << std::endl;
+//		std::cout << "src_r:" << std::endl;
+//		std::cout << src_r << std::endl;
+//		std::cout << "src_t:" << std::endl;
+//		std::cout << src_t << std::endl;
+//		std::cout << "src_k:" << std::endl;
+//		std::cout << src_k << std::endl;
+//
+//		std::cout << "tgt_shapes:" << std::endl;
+//		std::cout << tgt_shapes << std::endl;
+//		std::cout << "tgt_expr:" << std::endl;
+//		std::cout << tgt_expr << std::endl;
+//		std::cout << "tgt_r:" << std::endl;
+//		std::cout << tgt_r << std::endl;
+//		std::cout << "tgt_t:" << std::endl;
+//		std::cout << tgt_t << std::endl;
+//		std::cout << "tgt_k:" << std::endl;
+//		std::cout << tgt_k << std::endl;
 
 	}
 
