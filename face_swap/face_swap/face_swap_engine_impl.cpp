@@ -404,11 +404,12 @@ namespace face_swap
 	{
 		auto src_r = src_data.vecR;
 		auto tgt_r = tgt_data.vecR;
-		std::cout << "src_r:" << std::endl;
-		std::cout << src_r << std::endl;
-		std::cout << "tgt_r:" << std::endl;
-		std::cout << tgt_r << std::endl;
-		return true;
+		return std::fabs(src_r.at<float>(1) - tgt_r.at<float>(1)) < 0.1;
+//		std::cout << "src_r:" << std::endl;
+//		std::cout << src_r << std::endl;
+//		std::cout << "tgt_r:" << std::endl;
+//		std::cout << tgt_r << std::endl;
+//		return true;
 		// compare 2d segmentation map and 3d shape and pose
 //		auto src_shapes = src_data.shape_coefficients;
 //		auto src_expr = src_data.expr_coefficients;

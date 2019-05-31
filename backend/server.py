@@ -125,7 +125,7 @@ def swap():
             swapped_img = swapper.process_one(src_img, tgt_img)
             time_end = time.time()
             print('process_one time:', time_end-time_start)
-            if swapped_img.size != 0:
+            if swapped_img is not None  and swapped_img.size != 0:
                 img_name = '%s-%d.jpg' % (item, len(uuid_list[uuid][item]))
                 img_file = os.path.join(uuid_cache, img_name)
                 cv2.imwrite(img_file, swapped_img)
