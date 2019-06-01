@@ -1,5 +1,5 @@
 # Transfiguring Portraits
-This is a face swapping system introduced in the paper[1]. Users could type a portrait style and take a selfie, then the system will return some own portraits with the input style by using image search engine and face swapping method.
+This is a face swapping system introduced in the paper<sup>[1]</sup>. Users could type a portrait style and take a selfie, then the system will return some own portraits with the input style by using image search engine and face swapping method.
 
 Note: The detailed swapping method of this repo is not exactly the same as the original paper.
 
@@ -16,10 +16,10 @@ Note: The detailed swapping method of this repo is not exactly the same as the o
 ## Installation and Usage
 
 ### Faceswap
-Based on [face_swap](https://github.com/YuvalNirkin/face_swap/) with minor changes. Please refer to [face_swap](https://github.com/YuvalNirkin/face_swap/) for more information. Remember to build it with python interface and copy built pyd/so module into backend folder, and also download the data including 3dmm face model, cnn models, etc into backend folder.
+Based on [face_swap](https://github.com/YuvalNirkin/face_swap/)<sup>[2,3]</sup> with minor changes. Please refer to [face_swap](https://github.com/YuvalNirkin/face_swap/) for more information. Remember to build it with python interface and copy built pyd/so module into backend folder, and also download the data including 3dmm face model, cnn models, etc into backend folder.
 
 ### Backend Server
-Written by python3 with flask. Currently Bing image search is used with limited free account. Use your own account if you want to have a try.
+Written by python3 with flask. Currently Bing image search is used with limited free account. Use your own account if you want to have a try. To run on local machine, please configure local ip and azure key in config.json file.
 
 Install dependences by 
 > pip -r install requirements.txt

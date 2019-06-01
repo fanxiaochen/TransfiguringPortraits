@@ -4,7 +4,6 @@ import { Platform, CameraRoll } from 'react-native';
 import RNFS from 'react-native-fs';
 
 export const config = require("../../../config.json")
-console.log(config)
 export const serverUrl = `http://${config.local_ip}:${config.local_port}`;
 //export const serverUrl = 'http://192.168.31.126:5000';
 //export const serverUrl = 'http://xiaochenfan.xyz:9080';
