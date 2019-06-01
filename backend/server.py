@@ -147,6 +147,5 @@ def swap():
 
 
 if __name__ == "__main__":
-     #app.run(debug=True, host= '0.0.0.0')
-     #app.run(host='192.168.31.126')
+     #app.run(host='192.168.31.126', port=5000)
      app.run(host='127.0.0.1',port=9080, threaded=True)

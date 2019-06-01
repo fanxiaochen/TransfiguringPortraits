@@ -1,3 +1,4 @@
+import json
 from image_engine import BingImageEngine
 import face_swap_py as fspy
 
@@ -13,6 +14,8 @@ generic = False
 with_expr = False
 with_gpu = True
 gpu_device_id = 0
+
+config = "../config.json"
 
 
 class Swapper:
@@ -33,8 +36,10 @@ class Swapper:
                         generic, with_expr, with_gpu, gpu_device_id)
     
     def start_img_engine(self):
-        key = "3e49862cde1443c3b88b0538bb42b6cd"
-        self.img_engine = BingImageEngine(key)
+        with open(config) as json_file:  
+            conf = json.load(json_file)
+            key = conf["azure_key"]
+            self.img_engine = BingImageEngine(key)
     
     def set_image(self, img):
         img = fspy.FaceData(img)
