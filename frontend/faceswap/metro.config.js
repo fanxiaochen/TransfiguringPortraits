@@ -5,7 +5,13 @@
  * @format
  */
 
+const { resolve } = require('path');
+
 module.exports = {
+  watchFolders: [
+    resolve(__dirname, '.'),        // your 'native' directory
+    resolve(__dirname, '../../'),   // your '../' directory
+  ],
   transformer: {
     getTransformOptions: async () => ({
       transform: {
