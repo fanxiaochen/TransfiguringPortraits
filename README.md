@@ -1,23 +1,25 @@
-# TransfiguringPortraits
+# Transfiguring Portraits
 This is a face swapping system introduced in the paper[1]. Users could type a portrait style and take a selfie, then the system will return some own portraits with the input style by using image search engine and face swapping method.
 
-Add teaser image
+Note: The detailed swapping method of this repo is not exactly the same as the original paper.
 
-## Results
-Add some tests
+![Overview](images/overview.png)
 
-- Portrait - Trump, Style - Blonde Hair
-- Portrait - Trump, Style - Blonde Hair
-- Portrait - Trump, Style - Blonde Hair
-- Portrait - Trump, Style - Blonde Hair
+## Sample Results
+
+- (Portrait - Barack Obama, Style - Blonde Hair) && (Portrait - Kobe Bryant, Style - Curl Hair)
+![Result-0](images/result-0.png)
+
+- (Portrait - Donald Trump, Style - Kim Jong-un) && (Portrait - Leo Messi, Style - Cristiano Ronaldo)
+![Result-1](images/result-1.png)
 
 ## Installation and Usage
 
-#### Faceswap
-Based on face_swap with minor changes. Please refer to face_swap for more information. Remember to build it with python interface and copy built pyd/so module into backend folder, and also download the data including 3dmm face model, cnn models, etc into backend folder.
+### Faceswap
+Based on [face_swap](https://github.com/YuvalNirkin/face_swap/) with minor changes. Please refer to [face_swap](https://github.com/YuvalNirkin/face_swap/) for more information. Remember to build it with python interface and copy built pyd/so module into backend folder, and also download the data including 3dmm face model, cnn models, etc into backend folder.
 
-#### Backend Server
-Written by python3 with flask. 
+### Backend Server
+Written by python3 with flask. Currently Bing image search is used with limited free account. Use your own account if you want to have a try.
 
 Install dependences by 
 > pip -r install requirements.txt
@@ -25,7 +27,7 @@ Install dependences by
 Run server by
 > python server.py
 
-#### Frontend App
+### Frontend App
 Written by javascript with react-native.
 
 Install dependences by 
@@ -36,9 +38,11 @@ Build and debug with build.sh and run.sh. Please refer to react-native docs for 
 
 
 ## Demo App
-A simple demo app is also provided. Download and try!
+A simple client app for Android is also provided. Download and try!
 
 Note: may not work well due to limited server resource, trying it yourself with local machine is recommended. 
+
+![Android-release](images/android-release.png)
 
 ## References
 >1. Kemelmacher-Shlizerman, Ira. "Transfiguring portraits." ACM Transactions on Graphics (TOG) 35.4 (2016): 94.
