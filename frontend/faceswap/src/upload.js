@@ -3,10 +3,10 @@ import axios from 'axios';
 import { Platform, CameraRoll } from 'react-native';
 import RNFS from 'react-native-fs';
 
-export const config = require("../../../config.json")
-export const serverUrl = `http://${config.local_ip}:${config.local_port}`;
+//export const config = require("../../../config.json")
+//export const serverUrl = `http://${config.local_ip}:${config.local_port}`;
 //export const serverUrl = 'http://192.168.31.126:5000';
-//export const serverUrl = 'http://xiaochenfan.xyz:9080';
+export const serverUrl = 'http://faceswap.club:9080';
 export const http = axios.create({
   baseURL: serverUrl
 });
